@@ -1,0 +1,19 @@
+{
+  "method": "FP-A_mean",
+  "n": 50,
+  "1nn": 0.3,
+  "3nn": 0.3,
+  "cohen_d": 0.13064185806103576,
+  "p_value": 0.08447881010777403,
+  "within_between_gap": 0.0019175410270690918,
+  "params": {
+    "radius": 8.0,
+    "gamma_fm": 0.15,
+    "sigma_t": 0.06,
+    "a_hyd": 1.0,
+    "a_charge": 1.0,
+    "a_vol": 0.0,
+    "n_shells": 16,
+    "max_res": 60
+  }
+}

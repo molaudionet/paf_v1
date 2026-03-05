@@ -1,0 +1,5 @@
+key,pdb_path,error
+1FPC|A,data/cross_family/pdbs/1FPC.pdb,'A'
+1LQE|B,data/cross_family/pdbs/1LQE.pdb,'B'
+3TGI|A,data/cross_family/pdbs/3TGI.pdb,'A'
+3TJQ|C,data/cross_family/pdbs/3TJQ.pdb,'C'

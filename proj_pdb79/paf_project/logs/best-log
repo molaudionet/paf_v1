@@ -1,0 +1,19 @@
+
+[OK] 4WBO.pdb|A fam=TK nres=17 center=geom_density
+/Volumes/MolMine/webbk/bioai/proj/paf_project/compare_paf_vs_baselines_v1.py:218: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  plt.boxplot([within, between], labels=["within-family", "between-family"], showfliers=False)
+/Volumes/MolMine/webbk/bioai/proj/paf_project/compare_paf_vs_baselines_v1.py:218: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  plt.boxplot([within, between], labels=["within-family", "between-family"], showfliers=False)
+/Volumes/MolMine/webbk/bioai/proj/paf_project/compare_paf_vs_baselines_v1.py:218: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  plt.boxplot([within, between], labels=["within-family", "between-family"], showfliers=False)
+/Volumes/MolMine/webbk/bioai/proj/paf_project/compare_paf_vs_baselines_v1.py:218: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  plt.boxplot([within, between], labels=["within-family", "between-family"], showfliers=False)
+
+Wrote: results/compare_v1_best/comparison_results.csv
+
+     method  n  1nn  3nn  cohen_d      p_value  within_between_gap
+     PAF_v1 50 0.42 0.44 0.490042 2.625374e-07            0.085427
+  FP-A_mean 50 0.30 0.30 0.130642 8.447881e-02            0.001918
+FP-B_radial 50 0.30 0.32 0.049416 5.991861e-01            0.008133
+FP-C_sorted 50 0.26 0.30 0.315330 2.755218e-05            0.037344
+

@@ -1,0 +1,19 @@
+{
+  "method": "FP-C_sorted",
+  "n": 50,
+  "1nn": 0.26,
+  "3nn": 0.3,
+  "cohen_d": 0.3153300010619765,
+  "p_value": 2.755217531080767e-05,
+  "within_between_gap": 0.03734397888183594,
+  "params": {
+    "radius": 8.0,
+    "gamma_fm": 0.15,
+    "sigma_t": 0.06,
+    "a_hyd": 1.0,
+    "a_charge": 1.0,
+    "a_vol": 0.0,
+    "n_shells": 16,
+    "max_res": 60
+  }
+}

@@ -1,0 +1,502 @@
+{
+  "1M17.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1M17.pdb",
+    "chain_id": "A",
+    "ligand_resname": "AQ4",
+    "pocket_label": "EGFR",
+    "family": "TK",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 11
+  },
+  "2HYY.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2HYY.pdb",
+    "chain_id": "A",
+    "ligand_resname": "IRE",
+    "pocket_label": "EGFR_T790M",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "1IEP.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1IEP.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STI",
+    "pocket_label": "ABL1",
+    "family": "TK",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "2GQG.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2GQG.pdb",
+    "chain_id": "A",
+    "ligand_resname": "406",
+    "pocket_label": "ABL1_T315I",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 7
+  },
+  "3CS9.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3CS9.pdb",
+    "chain_id": "A",
+    "ligand_resname": "DAS",
+    "pocket_label": "SRC",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "2SRC.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2SRC.pdb",
+    "chain_id": "A",
+    "ligand_resname": "ANP",
+    "pocket_label": "SRC_apo",
+    "family": "TK",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 10
+  },
+  "1PKG.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1PKG.pdb",
+    "chain_id": "A",
+    "ligand_resname": "SU1",
+    "pocket_label": "FGFR1",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 10
+  },
+  "4V01.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4V01.pdb",
+    "chain_id": "A",
+    "ligand_resname": "032",
+    "pocket_label": "VEGFR2",
+    "family": "TK",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  },
+  "3LCK.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3LCK.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STU",
+    "pocket_label": "LCK",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 5
+  },
+  "1T46.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1T46.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STI",
+    "pocket_label": "PDGFR",
+    "family": "TK",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 7
+  },
+  "1HCK.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1HCK.pdb",
+    "chain_id": "A",
+    "ligand_resname": "ATP",
+    "pocket_label": "CDK2",
+    "family": "CMGC",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 10
+  },
+  "2VTH.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2VTH.pdb",
+    "chain_id": "A",
+    "ligand_resname": "K49",
+    "pocket_label": "CDK2_inh",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 10
+  },
+  "2I0V.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2I0V.pdb",
+    "chain_id": "A",
+    "ligand_resname": "LQQ",
+    "pocket_label": "CDK4",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "3EQG.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3EQG.pdb",
+    "chain_id": "A",
+    "ligand_resname": "FAS",
+    "pocket_label": "CDK6",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 16
+  },
+  "2ERK.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2ERK.pdb",
+    "chain_id": "A",
+    "ligand_resname": "ATP",
+    "pocket_label": "ERK2",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "3PY3.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3PY3.pdb",
+    "chain_id": "A",
+    "ligand_resname": "INH",
+    "pocket_label": "ERK2_inh",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 5
+  },
+  "1PME.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1PME.pdb",
+    "chain_id": "A",
+    "ligand_resname": "SB2",
+    "pocket_label": "P38alpha",
+    "family": "CMGC",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "3GCS.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3GCS.pdb",
+    "chain_id": "A",
+    "ligand_resname": "J60",
+    "pocket_label": "JNK1",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 5
+  },
+  "1Q5K.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1Q5K.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STU",
+    "pocket_label": "GSK3beta",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "3FI3.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3FI3.pdb",
+    "chain_id": "A",
+    "ligand_resname": "D57",
+    "pocket_label": "DYRK1A",
+    "family": "CMGC",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 7
+  },
+  "1ATP.pdb|E": {
+    "pdb_path": "data/kinase_pdbs/1ATP.pdb",
+    "chain_id": "E",
+    "ligand_resname": "ATP",
+    "pocket_label": "PKA",
+    "family": "AGC",
+    "center_method": "ligand_centroid",
+    "anchor2_method": "center_fallback",
+    "n_residues": 12
+  },
+  "1BKX.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1BKX.pdb",
+    "chain_id": "A",
+    "ligand_resname": "H89",
+    "pocket_label": "PKA_inh",
+    "family": "AGC",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 16
+  },
+  "3CQW.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3CQW.pdb",
+    "chain_id": "A",
+    "ligand_resname": "ANP",
+    "pocket_label": "AKT1",
+    "family": "AGC",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  },
+  "3MV5.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3MV5.pdb",
+    "chain_id": "A",
+    "ligand_resname": "MK2",
+    "pocket_label": "AKT2",
+    "family": "AGC",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  },
+  "3A8W.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3A8W.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STA",
+    "pocket_label": "PKCtheta",
+    "family": "AGC",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  },
+  "2X39.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2X39.pdb",
+    "chain_id": "A",
+    "ligand_resname": "Y27",
+    "pocket_label": "ROCK1",
+    "family": "AGC",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  },
+  "4GV1.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4GV1.pdb",
+    "chain_id": "A",
+    "ligand_resname": "SL0",
+    "pocket_label": "RSK2",
+    "family": "AGC",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 16
+  },
+  "2VN9.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2VN9.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STO",
+    "pocket_label": "CAMK2A",
+    "family": "CAMK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 11
+  },
+  "4BYI.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4BYI.pdb",
+    "chain_id": "A",
+    "ligand_resname": "SGX",
+    "pocket_label": "PIM1",
+    "family": "CAMK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "3FXZ.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3FXZ.pdb",
+    "chain_id": "A",
+    "ligand_resname": "LGH",
+    "pocket_label": "PIM2",
+    "family": "CAMK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 11
+  },
+  "3LXK.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3LXK.pdb",
+    "chain_id": "A",
+    "ligand_resname": "VER",
+    "pocket_label": "DAPK1",
+    "family": "CAMK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "3COK.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3COK.pdb",
+    "chain_id": "A",
+    "ligand_resname": "0LI",
+    "pocket_label": "CHK1",
+    "family": "CAMK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 7
+  },
+  "2CN5.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2CN5.pdb",
+    "chain_id": "A",
+    "ligand_resname": "DBQ",
+    "pocket_label": "CHK2",
+    "family": "CAMK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "3VN9.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3VN9.pdb",
+    "chain_id": "A",
+    "ligand_resname": "ACP",
+    "pocket_label": "MEK1",
+    "family": "STE",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 16
+  },
+  "4AN2.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4AN2.pdb",
+    "chain_id": "A",
+    "ligand_resname": "1FY",
+    "pocket_label": "MEK2",
+    "family": "STE",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 17
+  },
+  "4MNE.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4MNE.pdb",
+    "chain_id": "A",
+    "ligand_resname": "IPA",
+    "pocket_label": "PAK1",
+    "family": "STE",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 16
+  },
+  "2BDF.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2BDF.pdb",
+    "chain_id": "A",
+    "ligand_resname": "BAX",
+    "pocket_label": "BRAF",
+    "family": "STE",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "3Q96.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3Q96.pdb",
+    "chain_id": "A",
+    "ligand_resname": "032",
+    "pocket_label": "BRAF_V600E",
+    "family": "TKL",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "1BYG.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1BYG.pdb",
+    "chain_id": "A",
+    "ligand_resname": "SB4",
+    "pocket_label": "TGFBR1",
+    "family": "TKL",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "3HHM.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3HHM.pdb",
+    "chain_id": "A",
+    "ligand_resname": "5PP",
+    "pocket_label": "TAK1",
+    "family": "TKL",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 18
+  },
+  "4KN7.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4KN7.pdb",
+    "chain_id": "A",
+    "ligand_resname": "K1N",
+    "pocket_label": "MLK1",
+    "family": "TKL",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  },
+  "1CKJ.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/1CKJ.pdb",
+    "chain_id": "A",
+    "ligand_resname": "MGP",
+    "pocket_label": "CK1delta",
+    "family": "CK1",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 9
+  },
+  "4HNF.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4HNF.pdb",
+    "chain_id": "A",
+    "ligand_resname": "PF0",
+    "pocket_label": "CK1epsilon",
+    "family": "CK1",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 8
+  },
+  "3EFJ.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3EFJ.pdb",
+    "chain_id": "A",
+    "ligand_resname": "VX6",
+    "pocket_label": "AURKA",
+    "family": "Other",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 16
+  },
+  "2VGO.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2VGO.pdb",
+    "chain_id": "A",
+    "ligand_resname": "TAL",
+    "pocket_label": "PLK1",
+    "family": "Other",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 11
+  },
+  "2IVT.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/2IVT.pdb",
+    "chain_id": "A",
+    "ligand_resname": "STU",
+    "pocket_label": "HASPIN",
+    "family": "Other",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 9
+  },
+  "3C4C.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3C4C.pdb",
+    "chain_id": "A",
+    "ligand_resname": "IZA",
+    "pocket_label": "JAK2",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 6
+  },
+  "3EYG.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3EYG.pdb",
+    "chain_id": "A",
+    "ligand_resname": "PHA",
+    "pocket_label": "MET",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 7
+  },
+  "3PP0.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/3PP0.pdb",
+    "chain_id": "A",
+    "ligand_resname": "B43",
+    "pocket_label": "BTK",
+    "family": "TK",
+    "center_method": "motif_anchors",
+    "anchor2_method": "HRD_Asp_CA",
+    "n_residues": 10
+  },
+  "4WBO.pdb|A": {
+    "pdb_path": "data/kinase_pdbs/4WBO.pdb",
+    "chain_id": "A",
+    "ligand_resname": "3OY",
+    "pocket_label": "ALK",
+    "family": "TK",
+    "center_method": "geom_density",
+    "anchor2_method": "center_fallback",
+    "n_residues": 17
+  }
+}

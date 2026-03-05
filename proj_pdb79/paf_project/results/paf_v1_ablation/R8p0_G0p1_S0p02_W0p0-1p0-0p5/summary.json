@@ -1,0 +1,16 @@
+{
+  "n": 50,
+  "1nn": 0.38,
+  "3nn": 0.36,
+  "cohen_d": 0.45691354887562985,
+  "p_value": 4.124245206505444e-08,
+  "mean_within_minus_between": 0.07457160949707031,
+  "params": {
+    "radius": 8.0,
+    "gamma_fm": 0.1,
+    "sigma_t": 0.02,
+    "a_hyd": 0.0,
+    "a_charge": 1.0,
+    "a_vol": 0.5
+  }
+}

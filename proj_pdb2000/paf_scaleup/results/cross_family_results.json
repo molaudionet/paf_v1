@@ -1,0 +1,289 @@
+{
+  "spectral_pca_sweep": {
+    "no_pca": {
+      "n_components": 7680,
+      "accuracy": 0.8562793821356616,
+      "balanced_accuracy": 0.8033140346610114,
+      "variance_explained": 1.0
+    },
+    "pca_30": {
+      "n_components": 30,
+      "accuracy": 0.8374748153122902,
+      "balanced_accuracy": 0.7805320846014855,
+      "variance_explained": 0.7621716397685413
+    },
+    "pca_50": {
+      "n_components": 50,
+      "accuracy": 0.8529214237743452,
+      "balanced_accuracy": 0.7982308002495501,
+      "variance_explained": 0.8867675471955784
+    },
+    "pca_100": {
+      "n_components": 100,
+      "accuracy": 0.8542646071188718,
+      "balanced_accuracy": 0.8008404641331804,
+      "variance_explained": 0.966962151740368
+    },
+    "pca_200": {
+      "n_components": 200,
+      "accuracy": 0.8562793821356616,
+      "balanced_accuracy": 0.8024506159502888,
+      "variance_explained": 0.9918486116428813
+    },
+    "pca_500": {
+      "n_components": 500,
+      "accuracy": 0.8569509738079247,
+      "balanced_accuracy": 0.8039657674654404,
+      "variance_explained": 0.9995923829761997
+    }
+  },
+  "spectral": {
+    "accuracy": 0.8569509738079247,
+    "balanced_accuracy": 0.8039657674654404,
+    "cohens_d": 1.4200918961760935,
+    "p_value": 0.0,
+    "random_baseline": 0.09542239688316514,
+    "fold_vs_random": 8.980606249675038,
+    "within_between": {
+      "within_mean": 0.2128985157459784,
+      "within_std": 0.293129752944232,
+      "between_mean": -0.022187266666848757,
+      "between_std": 0.14585785464729872,
+      "cohens_d": 1.4200918961760935,
+      "n_within_pairs": 105037,
+      "n_between_pairs": 1002779
+    },
+    "per_class_accuracy": {
+      "aspartyl_protease": {
+        "recall": 0.9365079365079365,
+        "n": 63
+      },
+      "bromodomain": {
+        "recall": 0.9183673469387755,
+        "n": 98
+      },
+      "carbonic_anhydrase": {
+        "recall": 0.925531914893617,
+        "n": 94
+      },
+      "cyclooxygenase": {
+        "recall": 0.8607594936708861,
+        "n": 79
+      },
+      "dihydrofolate_reductase": {
+        "recall": 0.975,
+        "n": 80
+      },
+      "gpcr": {
+        "recall": 0.3157894736842105,
+        "n": 19
+      },
+      "histone_deacetylase": {
+        "recall": 0.9493670886075949,
+        "n": 79
+      },
+      "hsp90": {
+        "recall": 0.8205128205128205,
+        "n": 39
+      },
+      "kinase": {
+        "recall": 0.9044368600682594,
+        "n": 293
+      },
+      "metalloprotease": {
+        "recall": 0.7421875,
+        "n": 128
+      },
+      "nuclear_receptor": {
+        "recall": 0.9387755102040817,
+        "n": 196
+      },
+      "phosphatase": {
+        "recall": 0.8080808080808081,
+        "n": 99
+      },
+      "phosphodiesterase": {
+        "recall": 0.7653061224489796,
+        "n": 98
+      },
+      "proteasome": {
+        "recall": 0.8125,
+        "n": 80
+      },
+      "serine_protease": {
+        "recall": 0.38636363636363635,
+        "n": 44
+      }
+    },
+    "n_structures": 1489,
+    "n_families": 15,
+    "embedding_dim_raw": 7680,
+    "pca_components": 500
+  },
+  "mean": {
+    "accuracy": 0.8206850235057085,
+    "balanced_accuracy": 0.769816550323611,
+    "cohens_d": 0.4749024153032736,
+    "p_value": 0.0,
+    "random_baseline": 0.09542239688316514,
+    "fold_vs_random": 8.600549245378446,
+    "within_between": {
+      "within_mean": 0.9837329522244438,
+      "within_std": 0.01971407528462563,
+      "between_mean": 0.972677094296009,
+      "between_std": 0.023622665884769713,
+      "cohens_d": 0.4749024153032736,
+      "n_within_pairs": 105037,
+      "n_between_pairs": 1002779
+    },
+    "per_class_accuracy": {
+      "aspartyl_protease": {
+        "recall": 0.9206349206349206,
+        "n": 63
+      },
+      "bromodomain": {
+        "recall": 0.8469387755102041,
+        "n": 98
+      },
+      "carbonic_anhydrase": {
+        "recall": 0.925531914893617,
+        "n": 94
+      },
+      "cyclooxygenase": {
+        "recall": 0.8227848101265823,
+        "n": 79
+      },
+      "dihydrofolate_reductase": {
+        "recall": 0.9125,
+        "n": 80
+      },
+      "gpcr": {
+        "recall": 0.3157894736842105,
+        "n": 19
+      },
+      "histone_deacetylase": {
+        "recall": 0.9367088607594937,
+        "n": 79
+      },
+      "hsp90": {
+        "recall": 0.7435897435897436,
+        "n": 39
+      },
+      "kinase": {
+        "recall": 0.9078498293515358,
+        "n": 293
+      },
+      "metalloprotease": {
+        "recall": 0.6171875,
+        "n": 128
+      },
+      "nuclear_receptor": {
+        "recall": 0.9030612244897959,
+        "n": 196
+      },
+      "phosphatase": {
+        "recall": 0.7676767676767676,
+        "n": 99
+      },
+      "phosphodiesterase": {
+        "recall": 0.6224489795918368,
+        "n": 98
+      },
+      "proteasome": {
+        "recall": 0.85,
+        "n": 80
+      },
+      "serine_protease": {
+        "recall": 0.45454545454545453,
+        "n": 44
+      }
+    },
+    "n_structures": 1489,
+    "n_families": 15,
+    "embedding_dim_raw": 30,
+    "pca_components": null
+  },
+  "radial": {
+    "accuracy": 0.6024177300201478,
+    "balanced_accuracy": 0.5133486794102331,
+    "cohens_d": 0.381269184069173,
+    "p_value": 0.0,
+    "random_baseline": 0.09542239688316514,
+    "fold_vs_random": 6.313169126926732,
+    "within_between": {
+      "within_mean": 0.6526445828072618,
+      "within_std": 0.149492685569243,
+      "between_mean": 0.597221719563425,
+      "between_std": 0.14492473054447674,
+      "cohens_d": 0.381269184069173,
+      "n_within_pairs": 105037,
+      "n_between_pairs": 1002779
+    },
+    "per_class_accuracy": {
+      "aspartyl_protease": {
+        "recall": 0.6031746031746031,
+        "n": 63
+      },
+      "bromodomain": {
+        "recall": 0.4897959183673469,
+        "n": 98
+      },
+      "carbonic_anhydrase": {
+        "recall": 0.6595744680851063,
+        "n": 94
+      },
+      "cyclooxygenase": {
+        "recall": 0.4936708860759494,
+        "n": 79
+      },
+      "dihydrofolate_reductase": {
+        "recall": 0.8625,
+        "n": 80
+      },
+      "gpcr": {
+        "recall": 0.0,
+        "n": 19
+      },
+      "histone_deacetylase": {
+        "recall": 0.4936708860759494,
+        "n": 79
+      },
+      "hsp90": {
+        "recall": 0.3333333333333333,
+        "n": 39
+      },
+      "kinase": {
+        "recall": 0.8020477815699659,
+        "n": 293
+      },
+      "metalloprotease": {
+        "recall": 0.4140625,
+        "n": 128
+      },
+      "nuclear_receptor": {
+        "recall": 0.7142857142857143,
+        "n": 196
+      },
+      "phosphatase": {
+        "recall": 0.5454545454545454,
+        "n": 99
+      },
+      "phosphodiesterase": {
+        "recall": 0.4897959183673469,
+        "n": 98
+      },
+      "proteasome": {
+        "recall": 0.6625,
+        "n": 80
+      },
+      "serine_protease": {
+        "recall": 0.13636363636363635,
+        "n": 44
+      }
+    },
+    "n_structures": 1489,
+    "n_families": 15,
+    "embedding_dim_raw": 480,
+    "pca_components": null
+  }
+}

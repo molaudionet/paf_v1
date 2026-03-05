@@ -1,0 +1,245 @@
+[
+  {
+    "method": "PAF_v1",
+    "dfg_1nn": 0.5714285714285714,
+    "dfg_3nn": 0.6071428571428571,
+    "dfg_cohen_d": 0.25434197776979633,
+    "dfg_p_value": 0.01362646440779014,
+    "dfg_gap": 0.03945314884185791,
+    "kinase_1nn": 0.14285714285714285,
+    "kinase_cohen_d": 0.7319102214089523,
+    "kinase_p_value": 0.08016707885846919,
+    "paired_analysis": {
+      "n_paired_kinases": 11,
+      "paired_kinases": [
+        "ABL",
+        "BRAF",
+        "CDK2",
+        "EGFR",
+        "FGFR1",
+        "KIT",
+        "LCK",
+        "MET",
+        "SRC",
+        "VEGFR2",
+        "p38alpha"
+      ],
+      "same_kinase_diff_state_mean": 0.5476162465103951,
+      "same_kinase_diff_state_pairs": [
+        {
+          "kinase": "p38alpha",
+          "similarity": 0.2486771566581327
+        },
+        {
+          "kinase": "CDK2",
+          "similarity": 0.40370022313833365
+        },
+        {
+          "kinase": "ABL",
+          "similarity": 0.5853181260110942
+        },
+        {
+          "kinase": "EGFR",
+          "similarity": 0.7510227182267488
+        },
+        {
+          "kinase": "KIT",
+          "similarity": 0.630682646093323
+        },
+        {
+          "kinase": "BRAF",
+          "similarity": 0.35721900115312605
+        },
+        {
+          "kinase": "FGFR1",
+          "similarity": 0.4556754655374912
+        },
+        {
+          "kinase": "SRC",
+          "similarity": 0.3326699969827516
+        },
+        {
+          "kinase": "LCK",
+          "similarity": 0.6101445441331278
+        },
+        {
+          "kinase": "MET",
+          "similarity": 0.9805643150598577
+        },
+        {
+          "kinase": "VEGFR2",
+          "similarity": 0.6681045186203599
+        }
+      ],
+      "diff_kinase_same_state_mean": 0.4345852796242744,
+      "diff_kinase_same_state_n": 110,
+      "diff_kinase_diff_state_mean": 0.40237941988571646,
+      "diff_kinase_diff_state_n": 110,
+      "identity_dominates": true,
+      "state_sensitive": true,
+      "interpretation": "IDENTITY > STATE: Kinase identity dominates over DFG state | Same-state pairs more similar than cross-state pairs"
+    }
+  },
+  {
+    "method": "FP-A_mean",
+    "dfg_1nn": 0.32142857142857145,
+    "dfg_3nn": 0.42857142857142855,
+    "dfg_cohen_d": -0.055047078809037135,
+    "dfg_p_value": 0.5914544570620743,
+    "dfg_gap": -0.0002815723419189453,
+    "kinase_1nn": 0.10714285714285714,
+    "kinase_cohen_d": 0.32198699218952204,
+    "kinase_p_value": 0.2659067164198903,
+    "paired_analysis": {
+      "n_paired_kinases": 11,
+      "paired_kinases": [
+        "ABL",
+        "BRAF",
+        "CDK2",
+        "EGFR",
+        "FGFR1",
+        "KIT",
+        "LCK",
+        "MET",
+        "SRC",
+        "VEGFR2",
+        "p38alpha"
+      ],
+      "same_kinase_diff_state_mean": 0.9918776088240846,
+      "same_kinase_diff_state_pairs": [
+        {
+          "kinase": "p38alpha",
+          "similarity": 0.9946744862193256
+        },
+        {
+          "kinase": "CDK2",
+          "similarity": 0.992329434838279
+        },
+        {
+          "kinase": "ABL",
+          "similarity": 0.9913948249477895
+        },
+        {
+          "kinase": "EGFR",
+          "similarity": 0.9973237508963267
+        },
+        {
+          "kinase": "KIT",
+          "similarity": 0.993457307862601
+        },
+        {
+          "kinase": "BRAF",
+          "similarity": 0.9837765831108117
+        },
+        {
+          "kinase": "FGFR1",
+          "similarity": 0.9881449091684291
+        },
+        {
+          "kinase": "SRC",
+          "similarity": 0.9870918838594248
+        },
+        {
+          "kinase": "LCK",
+          "similarity": 0.9950933605650113
+        },
+        {
+          "kinase": "MET",
+          "similarity": 0.9997233913405451
+        },
+        {
+          "kinase": "VEGFR2",
+          "similarity": 0.9876437642563866
+        }
+      ],
+      "diff_kinase_same_state_mean": 0.9900292007077802,
+      "diff_kinase_same_state_n": 110,
+      "diff_kinase_diff_state_mean": 0.9903235500833091,
+      "diff_kinase_diff_state_n": 110,
+      "identity_dominates": true,
+      "state_sensitive": false,
+      "interpretation": "IDENTITY > STATE: Kinase identity dominates over DFG state | No clear state sensitivity in cross-kinase comparisons"
+    }
+  },
+  {
+    "method": "FP-B_radial",
+    "dfg_1nn": 0.6428571428571429,
+    "dfg_3nn": 0.5,
+    "dfg_cohen_d": 0.15577306287966008,
+    "dfg_p_value": 0.13190964741787536,
+    "dfg_gap": 0.017258763313293457,
+    "kinase_1nn": 0.07142857142857142,
+    "kinase_cohen_d": 0.14442740364183906,
+    "kinase_p_value": 0.7118966782244054,
+    "paired_analysis": {
+      "n_paired_kinases": 11,
+      "paired_kinases": [
+        "ABL",
+        "BRAF",
+        "CDK2",
+        "EGFR",
+        "FGFR1",
+        "KIT",
+        "LCK",
+        "MET",
+        "SRC",
+        "VEGFR2",
+        "p38alpha"
+      ],
+      "same_kinase_diff_state_mean": 0.6378091517501363,
+      "same_kinase_diff_state_pairs": [
+        {
+          "kinase": "p38alpha",
+          "similarity": 0.6130332642832936
+        },
+        {
+          "kinase": "CDK2",
+          "similarity": 0.4928056647504017
+        },
+        {
+          "kinase": "ABL",
+          "similarity": 0.5378008445191524
+        },
+        {
+          "kinase": "EGFR",
+          "similarity": 0.879637192198587
+        },
+        {
+          "kinase": "KIT",
+          "similarity": 0.72351971968469
+        },
+        {
+          "kinase": "BRAF",
+          "similarity": 0.5486374382223321
+        },
+        {
+          "kinase": "FGFR1",
+          "similarity": 0.5129728035610752
+        },
+        {
+          "kinase": "SRC",
+          "similarity": 0.49416380669662435
+        },
+        {
+          "kinase": "LCK",
+          "similarity": 0.6481489167522816
+        },
+        {
+          "kinase": "MET",
+          "similarity": 0.8834475443720972
+        },
+        {
+          "kinase": "VEGFR2",
+          "similarity": 0.6817334742109638
+        }
+      ],
+      "diff_kinase_same_state_mean": 0.619939050355494,
+      "diff_kinase_same_state_n": 110,
+      "diff_kinase_diff_state_mean": 0.6052721462946955,
+      "diff_kinase_diff_state_n": 110,
+      "identity_dominates": true,
+      "state_sensitive": true,
+      "interpretation": "IDENTITY > STATE: Kinase identity dominates over DFG state | Same-state pairs more similar than cross-state pairs"
+    }
+  }
+]

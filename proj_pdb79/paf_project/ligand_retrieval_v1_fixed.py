@@ -1,0 +1,1014 @@
+#!/usr/bin/env python3
+"""
+ligand_retrieval_v1.py
+
+Protein–Ligand compatibility retrieval experiment using:
+  - Pocket embedding: reuses your existing PAF pipeline if available (paf_core_v1.py)
+  - Ligand embedding: deterministic oscillatory encoding from ligand 3D coordinates
+  - Scoring: cosine(Ep, El) and (optional) cross-spectrum coherence-like score
+
+Inputs
+------
+A CSV manifest with at least these columns:
+  - pdb_path          (path relative to --pdb_dir or absolute path)
+  - protein_chain     (e.g., "A")
+  - ligand_resname    (e.g., "ATP", "ANP", "LIG")
+Optional:
+  - family            (used for easy vs hard negatives)
+  - pocket_center     (optional, ignored unless your PAF supports it)
+
+Example row:
+  data/pdbs/1ABC.pdb,A,ANP,Kinase
+
+Outputs
+-------
+Writes into --out:
+  - retrieval_table.csv
+  - metrics_easy.json
+  - metrics_hard.json
+  - ablation_controls.csv
+  - auroc_curves.png
+  - mrr_by_family.png
+  - summary_onepage.md
+
+Usage
+-----
+python ligand_retrieval_v1.py \
+  --pairs_csv data/cocrystal_pairs.csv \
+  --pdb_dir ./data/pdbs \
+  --out results/ligand_retrieval_v1 \
+  --radius 10.0 \
+  --gamma_fm 0.15 \
+  --sigma_t 0.04 \
+  --easy_negatives 50 \
+  --hard_negatives 50
+
+Notes
+-----
+1) Pocket embedding:
+   This script will try to import `paf_core_v1` and find a usable embedding function.
+   If it can't, it will fail with a clear message telling you what function signature
+   it looked for.
+
+2) Ligand embedding:
+   Uses RDKit to parse ligand from PDB. If RDKit cannot parse a ligand as a molecule
+   (common for some PDBs), we fall back to a simple HETATM coordinate parser and
+   compute a lighter-weight atom feature set.
+
+3) Cross-spectrum scoring:
+   Requires complex FFT arrays for both pocket and ligand. If pocket complex spectrum
+   isn't available from your PAF, cross-spectrum scoring is skipped automatically.
+"""
+
+import argparse
+import json
+import math
+import os
+import random
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.special import expit
+from scipy.stats import rankdata
+
+# Optional RDKit import
+try:
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+except Exception:
+    Chem = None
+    AllChem = None
+
+
+# -----------------------------
+# Utilities
+# -----------------------------
+from pathlib import Path
+
+def resolve_pdb_path(pdb_dir: str, pdb_path_in_csv: str) -> str:
+    """
+    Robust path resolver:
+    - If CSV path is absolute: use it.
+    - If CSV path already exists relative to CWD: use it.
+    - Else join pdb_dir + csv_path (works when csv_path is just '1M17.pdb').
+    """
+    p = Path(pdb_path_in_csv)
+    if p.is_absolute() and p.exists():
+        return str(p)
+
+    # if it's a relative path like data/kinase_pdbs/1M17.pdb and exists, keep it
+    if p.exists():
+        return str(p)
+
+    # otherwise treat as filename or relative fragment under pdb_dir
+    return str(Path(pdb_dir) / pdb_path_in_csv)
+
+def _mkdir(path: str) -> None:
+    os.makedirs(path, exist_ok=True)
+
+
+def _safe_json_dump(obj, path: str) -> None:
+    with open(path, "w") as f:
+        json.dump(obj, f, indent=2)
+
+
+def _cosine(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:
+    u = u.reshape(-1).astype(np.float64)
+    v = v.reshape(-1).astype(np.float64)
+    du = float(np.dot(u, u))
+    dv = float(np.dot(v, v))
+    if du < eps or dv < eps:
+        return 0.0
+    return float(np.dot(u, v) / (math.sqrt(du) * math.sqrt(dv)))
+
+
+def _auroc(labels: np.ndarray, scores: np.ndarray) -> float:
+    """
+    AUROC with ties handled via rank statistics.
+    labels: 1 for positive, 0 for negative
+    scores: higher = more positive
+    """
+    labels = labels.astype(int)
+    pos = labels == 1
+    neg = labels == 0
+    n_pos = int(pos.sum())
+    n_neg = int(neg.sum())
+    if n_pos == 0 or n_neg == 0:
+        return float("nan")
+    ranks = rankdata(scores)  # ascending ranks
+    # Mann–Whitney U
+    u = ranks[pos].sum() - n_pos * (n_pos + 1) / 2
+    return float(u / (n_pos * n_neg))
+
+
+def _mrr(ranks_1based: List[int]) -> float:
+    return float(np.mean([1.0 / r for r in ranks_1based])) if ranks_1based else float("nan")
+
+
+def _topk_acc(ranks_1based: List[int], k: int) -> float:
+    if not ranks_1based:
+        return float("nan")
+    return float(np.mean([1.0 if r <= k else 0.0 for r in ranks_1based]))
+
+
+# -----------------------------
+# Pocket embedding adapter (PAF)
+# -----------------------------
+@dataclass
+class PocketEmbedding:
+    key: str
+    family: str
+    E_mag: np.ndarray          # (K,) or (C,K) flattened later
+    S_complex: Optional[np.ndarray]  # complex spectrum, shape compatible with ligand complex
+
+
+def _try_import_paf():
+    try:
+        import paf_core_v1 as paf
+        return paf
+    except Exception as e:
+        raise RuntimeError(
+            "Could not import paf_core_v1.py in current folder/PYTHONPATH.\n"
+            "Place ligand_retrieval_v1.py in the same directory as paf_core_v1.py, "
+            "or ensure paf_core_v1 is importable.\n"
+            f"Import error: {e}"
+        )
+
+
+def _paf_embed_pocket(
+    paf_module,
+    pdb_path: str,
+    chain: str,
+    ligand_resname: str,
+    radius: float,
+    gamma_fm: float,
+    sigma_t: float,
+    a_hyd: float,
+    a_charge: float,
+    a_vol: float,
+) -> Tuple[np.ndarray, Optional[np.ndarray], str]:
+    """
+    Try a few expected function names/signatures.
+    Returns: (E_mag, S_complex_or_None, center_type_str)
+    """
+    # Candidate function names in likely order
+    candidates = [
+        "embed_pocket",                 # embed_pocket(pdb_path, chain, ligand_resname, ...)
+        "pocket_embedding_from_pdb",     # pocket_embedding_from_pdb(...)
+        "compute_pocket_embedding",      # compute_pocket_embedding(...)
+        "embed_from_pdb",               # embed_from_pdb(...)
+    ]
+
+    # Common kwargs
+    kwargs = dict(
+        radius=radius,
+        gamma_fm=gamma_fm,
+        sigma_t=sigma_t,
+        a_hyd=a_hyd,
+        a_charge=a_charge,
+        a_vol=a_vol,
+        ligand_resname=ligand_resname,
+        chain=chain,
+        pdb_path=pdb_path,
+    )
+
+    for fn_name in candidates:
+        if hasattr(paf_module, fn_name):
+            fn = getattr(paf_module, fn_name)
+            try:
+                out = fn(**kwargs)
+                # We accept several output shapes:
+                # 1) (E_mag, meta_dict)
+                # 2) (E_mag, S_complex, meta_dict)
+                # 3) dict with keys
+                center_type = "unknown"
+                if isinstance(out, dict):
+                    E_mag = out.get("E_mag", out.get("embedding", None))
+                    S_complex = out.get("S_complex", out.get("spectrum_complex", None))
+                    meta = out.get("meta", out)
+                    center_type = str(meta.get("center_type", meta.get("center", "unknown")))
+                    if E_mag is None:
+                        raise ValueError("dict output missing E_mag/embedding")
+                    return np.asarray(E_mag), (None if S_complex is None else np.asarray(S_complex)), center_type
+
+                if isinstance(out, tuple) or isinstance(out, list):
+                    if len(out) == 2:
+                        E_mag, meta = out
+                        if isinstance(meta, dict):
+                            center_type = str(meta.get("center_type", meta.get("center", "unknown")))
+                        return np.asarray(E_mag), None, center_type
+                    if len(out) >= 3:
+                        E_mag, S_complex, meta = out[0], out[1], out[2]
+                        if isinstance(meta, dict):
+                            center_type = str(meta.get("center_type", meta.get("center", "unknown")))
+                        return np.asarray(E_mag), np.asarray(S_complex), center_type
+
+                # Single array returned
+                return np.asarray(out), None, "unknown"
+
+            except TypeError:
+                # Signature mismatch; try next candidate
+                continue
+            except Exception as e:
+                # Function exists but failed in-body; propagate with context
+                raise RuntimeError(f"PAF pocket embedding failed in {fn_name} for {os.path.basename(pdb_path)}|{chain}: {e}")
+
+    raise RuntimeError(
+        "Could not find a compatible pocket embedding function in paf_core_v1.\n"
+        "Tried: embed_pocket, pocket_embedding_from_pdb, compute_pocket_embedding, embed_from_pdb\n\n"
+        "Please add one of these functions to paf_core_v1 with signature:\n"
+        "  embed_pocket(pdb_path, chain, ligand_resname, radius=..., gamma_fm=..., sigma_t=..., a_hyd=..., a_charge=..., a_vol=...)\n"
+        "and return either:\n"
+        "  (E_mag, meta_dict)\n"
+        "or\n"
+        "  (E_mag, S_complex, meta_dict)\n"
+    )
+
+
+# -----------------------------
+# Ligand extraction + embedding
+# -----------------------------
+ION_WATER = set([
+    "HOH", "WAT", "DOD", "H2O",
+    "NA", "K", "CL", "BR", "IOD", "I",
+    "CA", "MG", "ZN", "MN", "FE", "CU", "CO", "NI",
+    "SO4", "PO4", "NO3", "ACT", "ACE",
+    "PEG", "EDO", "GOL", "DMS", "MES", "TRS", "HEP"
+])
+
+
+def _parse_hetatm_ligand_coords_from_pdb(pdb_path: str, ligand_resname: str) -> Tuple[np.ndarray, List[str]]:
+    """
+    Robust parser: returns heavy-atom coordinates for matching resname.
+    Searches both HETATM and ATOM records.
+    Handles residue name padding and case variations.
+    """
+    ligand_resname = ligand_resname.strip().upper()
+    coords = []
+    elems = []
+    seen_resnames = set()
+
+    with open(pdb_path, "r", errors="ignore") as f:
+        for line in f:
+            is_hetatm = line.startswith("HETATM")
+            is_atom = line.startswith("ATOM  ")
+            if not (is_hetatm or is_atom):
+                continue
+
+            resn = line[17:20].strip().upper()
+
+            # Track all hetero residue names for diagnostics
+            if is_hetatm and resn not in {"HOH", "WAT", "DOD"}:
+                seen_resnames.add(resn)
+
+            if resn != ligand_resname:
+                continue
+
+            # For ATOM records, only include if it looks like a ligand
+            # (non-standard residue or explicitly matching)
+            if is_atom and resn in {
+                "ALA","ARG","ASN","ASP","CYS","GLN","GLU","GLY","HIS","ILE",
+                "LEU","LYS","MET","PHE","PRO","SER","THR","TRP","TYR","VAL"
+            }:
+                continue
+
+            # Element
+            elem = line[76:78].strip()
+            if not elem:
+                atom_name = line[12:16].strip()
+                elem = "".join([c for c in atom_name if c.isalpha()])[:2]
+                if len(elem) > 1:
+                    elem = elem[0].upper() + elem[1].lower()
+                else:
+                    elem = elem.upper()
+
+            # coords
+            try:
+                x = float(line[30:38])
+                y = float(line[38:46])
+                z = float(line[46:54])
+            except Exception:
+                continue
+
+            # heavy atoms only
+            if elem.upper() in ("H", "D"):
+                continue
+
+            coords.append([x, y, z])
+            elems.append(elem)
+
+    if not coords:
+        # Provide diagnostic info about what IS in the file
+        diag = f"No HETATM coords found for ligand_resname={ligand_resname}"
+        if seen_resnames:
+            diag += f". HETATM resnames in file: {sorted(seen_resnames)}"
+        else:
+            diag += ". File contains NO HETATM records (likely needs re-download from RCSB)"
+        raise ValueError(diag)
+
+    return np.asarray(coords, dtype=np.float32), elems
+
+
+def _rdkit_mol_from_pdb_ligand(pdb_path: str, ligand_resname: str) -> Optional[Chem.Mol]:
+    """
+    Try to load full PDB as RDKit mol and then isolate the residue by PDBResidueInfo.
+    """
+    if Chem is None:
+        return None
+
+    mol = Chem.MolFromPDBFile(pdb_path, removeHs=False, sanitize=False)
+    if mol is None:
+        return None
+
+    # sanitize lightly (sometimes fails; try best-effort)
+    try:
+        Chem.SanitizeMol(mol)
+    except Exception:
+        pass
+
+    # Collect atoms belonging to ligand_resname
+    lig_atom_ids = []
+    for a in mol.GetAtoms():
+        info = a.GetPDBResidueInfo()
+        if info is None:
+            continue
+        resn = info.GetResidueName().strip()
+        if resn == ligand_resname:
+            lig_atom_ids.append(a.GetIdx())
+
+    if not lig_atom_ids:
+        return None
+
+    # Create editable mol and remove non-ligand atoms
+    try:
+        emol = Chem.RWMol(mol)
+        keep = set(lig_atom_ids)
+        # Remove atoms in reverse order to preserve indices
+        for idx in sorted(range(mol.GetNumAtoms()), reverse=True):
+            if idx not in keep:
+                emol.RemoveAtom(idx)
+        lig = emol.GetMol()
+    except Exception:
+        return None
+
+    if lig is None or lig.GetNumAtoms() == 0:
+        return None
+
+    # Ensure conformer exists
+    if lig.GetNumConformers() == 0:
+        return None
+
+    return lig
+
+
+def _ligand_atom_features_rdkit(mol: Chem.Mol) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Returns:
+      coords (N,3)
+      feats  (N,d)
+    """
+    conf = mol.GetConformer()
+    N = mol.GetNumAtoms()
+    coords = np.zeros((N, 3), dtype=np.float32)
+
+    # Add Gasteiger charges if possible
+    try:
+        AllChem.ComputeGasteigerCharges(mol)
+    except Exception:
+        pass
+
+    feats = []
+    for i, a in enumerate(mol.GetAtoms()):
+        p = conf.GetAtomPosition(i)
+        coords[i] = [p.x, p.y, p.z]
+
+        z = a.GetAtomicNum()
+        aromatic = 1.0 if a.GetIsAromatic() else 0.0
+        hyb = int(a.GetHybridization())
+        degree = float(a.GetDegree())
+        formal_charge = float(a.GetFormalCharge())
+
+        # Gasteiger charge
+        gq = 0.0
+        try:
+            gq = float(a.GetProp("_GasteigerCharge"))
+            if math.isnan(gq) or math.isinf(gq):
+                gq = 0.0
+        except Exception:
+            gq = 0.0
+
+        is_donor = 0.0
+        is_acceptor = 0.0
+        # heuristic (fast): acceptor if O/N/S with not positive charge; donor if N/O with H (rough)
+        sym = a.GetSymbol().upper()
+        if sym in ("O", "N", "S") and formal_charge <= 0:
+            is_acceptor = 1.0
+        if sym in ("N", "O") and a.GetTotalNumHs(includeNeighbors=True) > 0:
+            is_donor = 1.0
+
+        feats.append([
+            z / 100.0,
+            aromatic,
+            hyb / 10.0,
+            degree / 6.0,
+            formal_charge / 5.0,
+            gq,
+            is_donor,
+            is_acceptor,
+        ])
+    return coords, np.asarray(feats, dtype=np.float32)
+
+
+def _ligand_atom_features_fallback(coords: np.ndarray, elems: List[str]) -> np.ndarray:
+    """
+    Minimal deterministic features if RDKit parsing fails.
+    """
+    z_map = {
+        "C": 6, "N": 7, "O": 8, "F": 9, "P": 15, "S": 16, "CL": 17, "BR": 35, "I": 53,
+        "B": 5, "SI": 14
+    }
+    feats = []
+    for e in elems:
+        eu = e.strip().upper()
+        if len(eu) == 2 and eu[1].islower():
+            eu = eu[0].upper() + eu[1].lower()
+        eu2 = eu.upper()
+        z = z_map.get(eu2, 0)
+        feats.append([
+            z / 100.0,
+            0.0,  # aromatic unknown
+            0.0,  # hybridization unknown
+            0.0,  # degree unknown
+            0.0,  # formal charge unknown
+            0.0,  # partial charge unknown
+            0.0,  # donor
+            0.0,  # acceptor
+        ])
+    return np.asarray(feats, dtype=np.float32)
+
+
+def _oscillatory_embed_from_points(
+    coords: np.ndarray,
+    feats: np.ndarray,
+    K: int = 256,
+    sr: int = 2000,
+    dur: float = 1.0,
+    sigma_t: float = 0.04,
+    gamma_fm: float = 0.15,
+    w: Optional[np.ndarray] = None,
+    fmin: float = 120.0,
+    fmax: float = 1200.0,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Deterministic oscillatory embedding for a set of points with features.
+
+    Returns:
+      E_mag: (K,) magnitude spectrum (rfft)
+      S_complex: (K,) complex spectrum (rfft)
+    """
+    assert coords.ndim == 2 and coords.shape[1] == 3
+    assert feats.ndim == 2 and feats.shape[0] == coords.shape[0]
+
+    N = coords.shape[0]
+    if w is None:
+        # simple fixed projection
+        w = np.zeros((feats.shape[1],), dtype=np.float32)
+        # emphasize atomic number, charge-ish dimensions if present
+        w[0] = 2.0
+        if feats.shape[1] > 5:
+            w[5] = 1.0
+        if feats.shape[1] > 1:
+            w[1] = 0.5
+
+    # center and radial distances
+    c = coords.mean(axis=0, keepdims=True)
+    r = np.linalg.norm(coords - c, axis=1)
+    rmax = float(np.max(r)) + 1e-6
+
+    # angles (use azimuth)
+    az = np.arctan2(coords[:, 1] - c[0, 1], coords[:, 0] - c[0, 0])
+
+    # time grid
+    M = int(sr * dur)
+    t = np.linspace(0.0, dur, M, endpoint=False).astype(np.float32)
+
+    # map features -> scalar
+    sfeat = feats @ w
+    # normalize
+    sfeat = (sfeat - np.mean(sfeat)) / (np.std(sfeat) + 1e-6)
+
+    # map to frequency in audio band
+    # sigmoid to clamp
+    freq = fmin + (fmax - fmin) * expit(sfeat).astype(np.float32)
+
+    # apply angular FM
+    freq = freq * (1.0 + gamma_fm * np.cos(az).astype(np.float32))
+
+    # map radius to time center
+    tau = (r / rmax) * (dur * 0.85) + (dur * 0.05)
+
+    # build signal
+    sig = np.zeros((M,), dtype=np.float32)
+    for i in range(N):
+        # gaussian window
+        win = np.exp(-0.5 * ((t - tau[i]) / sigma_t) ** 2).astype(np.float32)
+        sig += win * np.cos(2.0 * np.pi * freq[i] * t).astype(np.float32)
+
+    # FFT
+    S = np.fft.rfft(sig, n=2 * (K - 1))  # rfft length K
+    S = S[:K]
+    E = np.abs(S).astype(np.float32)
+    # normalize
+    E /= (np.linalg.norm(E) + 1e-12)
+    return E, S
+
+
+@dataclass
+class LigandEmbedding:
+    key: str
+    family: str
+    E_mag: np.ndarray
+    S_complex: np.ndarray
+
+
+def _embed_ligand_from_pdb(
+    pdb_path: str,
+    ligand_resname: str,
+    family: str,
+    K: int,
+    sigma_t: float,
+    gamma_fm: float,
+) -> LigandEmbedding:
+    key = f"{os.path.basename(pdb_path)}|{ligand_resname}"
+    # RDKit path
+    if Chem is not None:
+        lig = _rdkit_mol_from_pdb_ligand(pdb_path, ligand_resname)
+        if lig is not None and lig.GetNumAtoms() >= 3:
+            coords, feats = _ligand_atom_features_rdkit(lig)
+            E, S = _oscillatory_embed_from_points(coords, feats, K=K, sigma_t=sigma_t, gamma_fm=gamma_fm)
+            return LigandEmbedding(key=key, family=family, E_mag=E, S_complex=S)
+
+    # fallback parser
+    coords, elems = _parse_hetatm_ligand_coords_from_pdb(pdb_path, ligand_resname)
+    feats = _ligand_atom_features_fallback(coords, elems)
+    E, S = _oscillatory_embed_from_points(coords, feats, K=K, sigma_t=sigma_t, gamma_fm=gamma_fm)
+    return LigandEmbedding(key=key, family=family, E_mag=E, S_complex=S)
+
+
+# -----------------------------
+# Scoring + retrieval evaluation
+# -----------------------------
+def _crossspec_score(SP: np.ndarray, SL: np.ndarray, eps: float = 1e-9) -> float:
+    """
+    Coherence-like scalar based on normalized cross-spectrum magnitude.
+    """
+    SP = np.asarray(SP)
+    SL = np.asarray(SL)
+    if SP.shape != SL.shape:
+        # try align by truncation
+        m = min(SP.shape[0], SL.shape[0])
+        SP = SP[:m]
+        SL = SL[:m]
+    num = np.abs(SP * np.conj(SL))
+    den = (np.abs(SP) * np.abs(SL) + eps)
+    return float(np.sum(num / den) / (len(num) + 1e-9))
+
+
+def _build_negative_sets(df: pd.DataFrame, easy_n: int, hard_n: int, seed: int) -> Dict[str, Dict[str, List[int]]]:
+    """
+    For each i, return indices for easy/hard negatives.
+    Requires 'family' column; if missing, all negatives are hard.
+    """
+    rng = random.Random(seed)
+    n = len(df)
+    families = df["family"].fillna("NA").tolist() if "family" in df.columns else ["NA"] * n
+    idx_by_fam: Dict[str, List[int]] = {}
+    for i, fam in enumerate(families):
+        idx_by_fam.setdefault(fam, []).append(i)
+
+    neg_sets = {}
+    for i in range(n):
+        fam_i = families[i]
+        all_other = [j for j in range(n) if j != i]
+
+        if "family" not in df.columns:
+            # No family: treat all as hard
+            hard = rng.sample(all_other, k=min(hard_n, len(all_other)))
+            easy = rng.sample(all_other, k=min(easy_n, len(all_other)))
+        else:
+            same = [j for j in idx_by_fam.get(fam_i, []) if j != i]
+            diff = [j for j in all_other if families[j] != fam_i]
+
+            easy = rng.sample(diff, k=min(easy_n, len(diff))) if len(diff) > 0 else []
+            hard = rng.sample(same, k=min(hard_n, len(same))) if len(same) > 0 else []
+
+            # If not enough, backfill from all_other
+            if len(easy) < min(easy_n, len(all_other)):
+                remaining = [j for j in all_other if j not in easy]
+                need = min(easy_n, len(all_other)) - len(easy)
+                easy += rng.sample(remaining, k=min(need, len(remaining)))
+
+            if len(hard) < min(hard_n, len(all_other)):
+                remaining = [j for j in all_other if j not in hard]
+                need = min(hard_n, len(all_other)) - len(hard)
+                hard += rng.sample(remaining, k=min(need, len(remaining)))
+
+        neg_sets[str(i)] = {"easy": easy, "hard": hard}
+    return neg_sets
+
+
+def _evaluate_retrieval(
+    pocket_embs: List[PocketEmbedding],
+    ligand_embs: List[LigandEmbedding],
+    neg_sets: Dict[str, Dict[str, List[int]]],
+    use_crossspec: bool,
+) -> Tuple[pd.DataFrame, Dict[str, float], Dict[str, float], Dict[str, float]]:
+    """
+    Returns:
+      retrieval_table
+      metrics_easy
+      metrics_hard
+      auroc_curves_data (for plotting)
+    """
+    n = len(pocket_embs)
+    assert len(ligand_embs) == n
+
+    # Precompute score matrices
+    score_cos = np.zeros((n, n), dtype=np.float32)
+    score_xs = np.full((n, n), np.nan, dtype=np.float32)
+
+    # Flatten pocket E if needed
+    def flatten_E(E):
+        E = np.asarray(E)
+        return E.reshape(-1)
+
+    for i in range(n):
+        Ep = flatten_E(pocket_embs[i].E_mag)
+        for j in range(n):
+            El = flatten_E(ligand_embs[j].E_mag)
+            score_cos[i, j] = _cosine(Ep, El)
+            if use_crossspec and pocket_embs[i].S_complex is not None:
+                score_xs[i, j] = _crossspec_score(pocket_embs[i].S_complex, ligand_embs[j].S_complex)
+
+    rows = []
+    ranks_easy_cos, ranks_easy_xs = [], []
+    ranks_hard_cos, ranks_hard_xs = [], []
+    auroc_easy_cos, auroc_easy_xs = [], []
+    auroc_hard_cos, auroc_hard_xs = [], []
+
+    for i in range(n):
+        pos_j = i
+
+        # Helper: evaluate for a given negative set
+        def eval_for(neg_idx: List[int], scores_row: np.ndarray) -> Tuple[int, float]:
+            cand = [pos_j] + list(neg_idx)
+            sc = scores_row[cand]
+            # higher is better
+            order = np.argsort(-sc)
+            rank_1based = int(np.where(order == 0)[0][0]) + 1  # pos is at index 0 in cand
+            labels = np.zeros(len(cand), dtype=int)
+            labels[0] = 1
+            au = _auroc(labels, sc)
+            return rank_1based, au
+
+        easy = neg_sets[str(i)]["easy"]
+        hard = neg_sets[str(i)]["hard"]
+
+        r_ec, au_ec = eval_for(easy, score_cos[i])
+        r_hc, au_hc = eval_for(hard, score_cos[i])
+
+        ranks_easy_cos.append(r_ec)
+        ranks_hard_cos.append(r_hc)
+        auroc_easy_cos.append(au_ec)
+        auroc_hard_cos.append(au_hc)
+
+        r_ex, r_hx = None, None
+        au_ex, au_hx = None, None
+        if use_crossspec and not np.isnan(score_xs[i, pos_j]):
+            r_ex, au_ex = eval_for(easy, score_xs[i])
+            r_hx, au_hx = eval_for(hard, score_xs[i])
+            ranks_easy_xs.append(r_ex)
+            ranks_hard_xs.append(r_hx)
+            auroc_easy_xs.append(au_ex)
+            auroc_hard_xs.append(au_hx)
+
+        rows.append({
+            "i": i,
+            "pocket_key": pocket_embs[i].key,
+            "ligand_key_native": ligand_embs[pos_j].key,
+            "family": pocket_embs[i].family,
+            "rank_easy_cosine": r_ec,
+            "rank_hard_cosine": r_hc,
+            "auroc_easy_cosine": au_ec,
+            "auroc_hard_cosine": au_hc,
+            "rank_easy_crossspec": r_ex,
+            "rank_hard_crossspec": r_hx,
+            "auroc_easy_crossspec": au_ex,
+            "auroc_hard_crossspec": au_hx,
+        })
+
+    tab = pd.DataFrame(rows)
+
+    metrics_easy = {
+        "n": n,
+        "top1_cosine": _topk_acc(ranks_easy_cos, 1),
+        "top5_cosine": _topk_acc(ranks_easy_cos, 5),
+        "top10_cosine": _topk_acc(ranks_easy_cos, 10),
+        "mrr_cosine": _mrr(ranks_easy_cos),
+        "mean_auroc_cosine": float(np.nanmean(auroc_easy_cos)),
+    }
+    metrics_hard = {
+        "n": n,
+        "top1_cosine": _topk_acc(ranks_hard_cos, 1),
+        "top5_cosine": _topk_acc(ranks_hard_cos, 5),
+        "top10_cosine": _topk_acc(ranks_hard_cos, 10),
+        "mrr_cosine": _mrr(ranks_hard_cos),
+        "mean_auroc_cosine": float(np.nanmean(auroc_hard_cos)),
+    }
+
+    if use_crossspec and len(ranks_easy_xs) == n:
+        metrics_easy.update({
+            "top1_crossspec": _topk_acc(ranks_easy_xs, 1),
+            "top5_crossspec": _topk_acc(ranks_easy_xs, 5),
+            "top10_crossspec": _topk_acc(ranks_easy_xs, 10),
+            "mrr_crossspec": _mrr(ranks_easy_xs),
+            "mean_auroc_crossspec": float(np.nanmean(auroc_easy_xs)),
+        })
+        metrics_hard.update({
+            "top1_crossspec": _topk_acc(ranks_hard_xs, 1),
+            "top5_crossspec": _topk_acc(ranks_hard_xs, 5),
+            "top10_crossspec": _topk_acc(ranks_hard_xs, 10),
+            "mrr_crossspec": _mrr(ranks_hard_xs),
+            "mean_auroc_crossspec": float(np.nanmean(auroc_hard_xs)),
+        })
+
+    curves = {
+        "auroc_easy_cosine": float(np.nanmean(auroc_easy_cos)),
+        "auroc_hard_cosine": float(np.nanmean(auroc_hard_cos)),
+        "auroc_easy_crossspec": float(np.nanmean(auroc_easy_xs)) if auroc_easy_xs else float("nan"),
+        "auroc_hard_crossspec": float(np.nanmean(auroc_hard_xs)) if auroc_hard_xs else float("nan"),
+    }
+    return tab, metrics_easy, metrics_hard, curves
+
+
+# -----------------------------
+# Controls (ablations)
+# -----------------------------
+def _shuffle_coords(coords: np.ndarray, seed: int) -> np.ndarray:
+    rng = np.random.default_rng(seed)
+    idx = np.arange(coords.shape[0])
+    rng.shuffle(idx)
+    return coords[idx].copy()
+
+
+def _shuffle_feats(feats: np.ndarray, seed: int) -> np.ndarray:
+    rng = np.random.default_rng(seed)
+    idx = np.arange(feats.shape[0])
+    rng.shuffle(idx)
+    return feats[idx].copy()
+
+
+# -----------------------------
+# Plotting
+# -----------------------------
+def _plot_simple_bar(curves: Dict[str, float], out_png: str) -> None:
+    keys = list(curves.keys())
+    vals = [curves[k] for k in keys]
+    plt.figure()
+    plt.bar(range(len(keys)), vals)
+    plt.xticks(range(len(keys)), keys, rotation=45, ha="right")
+    plt.ylabel("Mean AUROC")
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=200)
+    plt.close()
+
+
+def _plot_mrr_by_family(tab: pd.DataFrame, out_png: str, mode: str = "easy") -> None:
+    col = f"rank_{mode}_cosine"
+    if col not in tab.columns:
+        return
+    fams = sorted(tab["family"].fillna("NA").unique().tolist())
+    mrrs = []
+    for f in fams:
+        ranks = tab.loc[tab["family"] == f, col].dropna().astype(int).tolist()
+        mrrs.append(_mrr(ranks))
+    plt.figure()
+    plt.bar(range(len(fams)), mrrs)
+    plt.xticks(range(len(fams)), fams, rotation=45, ha="right")
+    plt.ylabel(f"MRR ({mode} negatives, cosine)")
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=200)
+    plt.close()
+
+
+# -----------------------------
+# Main
+# -----------------------------
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--pairs_csv", required=True, help="CSV of co-crystal pairs")
+    ap.add_argument("--pdb_dir", default="./data/pdbs", help="Base directory for pdb_path if relative")
+    ap.add_argument("--out", required=True, help="Output folder")
+    ap.add_argument("--radius", type=float, default=10.0)
+    ap.add_argument("--gamma_fm", type=float, default=0.15)
+    ap.add_argument("--sigma_t", type=float, default=0.04)
+    ap.add_argument("--a_hyd", type=float, default=1.0)
+    ap.add_argument("--a_charge", type=float, default=1.0)
+    ap.add_argument("--a_vol", type=float, default=0.5)
+    ap.add_argument("--K", type=int, default=256, help="FFT bins for ligand embed")
+    ap.add_argument("--easy_negatives", type=int, default=50)
+    ap.add_argument("--hard_negatives", type=int, default=50)
+    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--skip_crossspec", action="store_true", help="Skip cross-spectrum scoring even if available")
+    args = ap.parse_args()
+
+    _mkdir(args.out)
+
+    df = pd.read_csv(args.pairs_csv)
+    required = ["pdb_path", "protein_chain", "ligand_resname"]
+    for c in required:
+        if c not in df.columns:
+            raise ValueError(f"pairs_csv missing required column: {c}")
+    if "family" not in df.columns:
+        df["family"] = "NA"
+
+    # Resolve pdb paths
+    pdb_paths = []
+    for p in df["pdb_path"].tolist():
+        p = str(p)
+        if os.path.isabs(p):
+            pdb_paths.append(p)
+        else:
+            pdb_paths.append(os.path.join(args.pdb_dir, p) if not p.startswith(args.pdb_dir) else p)
+
+    # Import PAF
+    paf = _try_import_paf()
+
+    pocket_embs: List[PocketEmbedding] = []
+    ligand_embs: List[LigandEmbedding] = []
+    ok_indices: List[int] = []  # track which DataFrame rows succeeded
+
+    # Embed all pairs
+    ok = 0
+    for i in range(len(df)):
+        pdb_path = pdb_paths[i]
+        chain = str(df.loc[i, "protein_chain"])
+        lig = str(df.loc[i, "ligand_resname"]).strip()
+        fam = str(df.loc[i, "family"]) if "family" in df.columns else "NA"
+
+        key_p = f"{os.path.basename(pdb_path)}|{chain}|{lig}"
+        try:
+            E_mag, S_complex, center_type = _paf_embed_pocket(
+                paf, pdb_path, chain, lig,
+                radius=args.radius,
+                gamma_fm=args.gamma_fm,
+                sigma_t=args.sigma_t,
+                a_hyd=args.a_hyd,
+                a_charge=args.a_charge,
+                a_vol=args.a_vol,
+            )
+            E_mag = np.asarray(E_mag)
+            # PAF pocket embedding is (C, K) e.g. (30, 256) — multi-channel spectrum.
+            # Ligand embedding is single-channel (K,) e.g. (256,).
+            # Reduce pocket to (K,) by summing energy across channels for cross-modal comparison.
+            if E_mag.ndim == 2:
+                E_mag_reduced = E_mag.sum(axis=0)  # (K,) — total spectral energy per freq bin
+            else:
+                E_mag_reduced = E_mag.reshape(-1)
+            E_mag_reduced = E_mag_reduced / (np.linalg.norm(E_mag_reduced) + 1e-12)
+
+            # Embed ligand BEFORE appending pocket (ensures alignment)
+            lig_emb = _embed_ligand_from_pdb(
+                pdb_path=pdb_path,
+                ligand_resname=lig,
+                family=fam,
+                K=args.K,
+                sigma_t=args.sigma_t,
+                gamma_fm=args.gamma_fm,
+            )
+
+            # Both succeeded — now append both
+            pocket_embs.append(PocketEmbedding(
+                key=key_p, family=fam, E_mag=E_mag_reduced, S_complex=S_complex
+            ))
+            ligand_embs.append(lig_emb)
+            ok_indices.append(i)
+
+            ok += 1
+            print(f"[OK] {key_p} fam={fam} center={center_type}")
+        except Exception as e:
+            print(f"[FAIL] {key_p}: {e}")
+
+    if ok < 3:
+        raise RuntimeError(f"Only {ok} embeddings extracted; too few to evaluate. Fix PDB parsing/manifest issues.")
+
+    # Use exactly the rows that succeeded (aligned by ok_indices)
+    n = len(pocket_embs)
+    assert len(ligand_embs) == n, f"Alignment error: {len(pocket_embs)} pockets vs {len(ligand_embs)} ligands"
+    df_ok = df.iloc[ok_indices].copy().reset_index(drop=True)
+
+    # Build negative sets
+    neg_sets = _build_negative_sets(df_ok, args.easy_negatives, args.hard_negatives, seed=args.seed)
+
+    # Evaluate retrieval
+    use_crossspec = (not args.skip_crossspec) and all(pe.S_complex is not None for pe in pocket_embs)
+    if not use_crossspec:
+        print("[WARN] Cross-spectrum scoring disabled (pocket complex spectrum not available or --skip_crossspec set).")
+
+    tab, metrics_easy, metrics_hard, curves = _evaluate_retrieval(pocket_embs, ligand_embs, neg_sets, use_crossspec)
+
+    tab_path = os.path.join(args.out, "retrieval_table.csv")
+    tab.to_csv(tab_path, index=False)
+
+    _safe_json_dump(metrics_easy, os.path.join(args.out, "metrics_easy.json"))
+    _safe_json_dump(metrics_hard, os.path.join(args.out, "metrics_hard.json"))
+
+    _plot_simple_bar(curves, os.path.join(args.out, "auroc_curves.png"))
+    _plot_mrr_by_family(tab, os.path.join(args.out, "mrr_by_family.png"), mode="easy")
+
+    # One-page summary markdown (copy-paste to paper)
+    summary_md = os.path.join(args.out, "summary_onepage.md")
+    with open(summary_md, "w") as f:
+        f.write("# Ligand–Pocket Retrieval Summary (v1)\n\n")
+        f.write(f"- n pairs: {n}\n")
+        f.write(f"- pocket params: radius={args.radius}, gamma_fm={args.gamma_fm}, sigma_t={args.sigma_t}\n")
+        f.write(f"- ligand embed: K={args.K}, gamma_fm={args.gamma_fm}, sigma_t={args.sigma_t}\n")
+        f.write(f"- cross-spectrum scoring: {'ON' if use_crossspec else 'OFF'}\n\n")
+        f.write("## Easy negatives\n")
+        f.write("```json\n" + json.dumps(metrics_easy, indent=2) + "\n```\n\n")
+        f.write("## Hard negatives\n")
+        f.write("```json\n" + json.dumps(metrics_hard, indent=2) + "\n```\n\n")
+        f.write("## Files\n")
+        f.write("- retrieval_table.csv\n- metrics_easy.json\n- metrics_hard.json\n- auroc_curves.png\n- mrr_by_family.png\n")
+
+    print("\n=== DONE ===")
+    print(f"Wrote: {tab_path}")
+    print(f"Wrote: {os.path.join(args.out, 'metrics_easy.json')}")
+    print(f"Wrote: {os.path.join(args.out, 'metrics_hard.json')}")
+    print(f"Wrote: {summary_md}")
+
+    # Minimal ablation controls placeholder (you can expand once you confirm baseline works)
+    # We record only whether crossspec ran and basic params for provenance.
+    ablations = pd.DataFrame([{
+        "tag": "baseline",
+        "n": n,
+        "use_crossspec": use_crossspec,
+        "radius": args.radius,
+        "gamma_fm": args.gamma_fm,
+        "sigma_t": args.sigma_t,
+        "a_hyd": args.a_hyd,
+        "a_charge": args.a_charge,
+        "a_vol": args.a_vol,
+        "top1_easy_cosine": metrics_easy.get("top1_cosine", None),
+        "mrr_easy_cosine": metrics_easy.get("mrr_cosine", None),
+        "top1_hard_cosine": metrics_hard.get("top1_cosine", None),
+        "mrr_hard_cosine": metrics_hard.get("mrr_cosine", None),
+    }])
+    ablations.to_csv(os.path.join(args.out, "ablation_controls.csv"), index=False)
+
+
+if __name__ == "__main__":
+    main()

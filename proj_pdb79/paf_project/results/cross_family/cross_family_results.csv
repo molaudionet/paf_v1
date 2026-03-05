@@ -1,0 +1,4 @@
+method,family_1nn,family_3nn,family_cohen_d,family_p_value,family_gap,sub_kinase_1nn,sub_kinase_d,sub_kinase_p,sub_metalloprotease_1nn,sub_metalloprotease_d,sub_metalloprotease_p,sub_nuclear_receptor_1nn,sub_nuclear_receptor_d,sub_nuclear_receptor_p,sub_serine_protease_1nn,sub_serine_protease_d,sub_serine_protease_p
+PAF_v1,0.7721518987341772,0.7215189873417721,0.7482240582086801,0.0,0.10180392861366272,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+FP-A_mean,0.6075949367088608,0.6835443037974683,0.4199157236863928,0.0,0.003186464309692383,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+FP-B_radial,0.6708860759493671,0.6329113924050633,0.3173394270593568,6.084022174945858e-14,0.041626572608947754,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0

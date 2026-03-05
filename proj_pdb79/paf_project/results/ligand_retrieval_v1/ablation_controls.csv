@@ -1,0 +1,2 @@
+tag,n,use_crossspec,radius,gamma_fm,sigma_t,a_hyd,a_charge,a_vol,top1_easy_cosine,mrr_easy_cosine,top1_hard_cosine,mrr_hard_cosine
+baseline,50,False,10.0,0.15,0.04,1.0,1.0,0.5,0.02,0.08090238781159456,0.02,0.08103262036973408

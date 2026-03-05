@@ -1,0 +1,4 @@
+label,reason
+ABL1,Only 4 pocket residues found in data/kinase_pdbs/1IEP.pdb chain A within 10.0Å. Too few.
+CHK1,Only 0 pocket residues found in data/kinase_pdbs/3COK.pdb chain A within 10.0Å. Too few.
+MLK1,Only 0 pocket residues found in data/kinase_pdbs/4KN7.pdb chain A within 10.0Å. Too few.

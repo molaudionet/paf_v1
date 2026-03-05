@@ -1,0 +1,13 @@
+{
+  "encoding": {
+    "n_pockets": 194,
+    "total_sec": 184.01746892929077,
+    "ms_per_pocket": 948.5436542746946
+  },
+  "pairwise": {
+    "n_pockets": 194,
+    "n_pairs": 18721,
+    "total_sec": 0.002794981002807617,
+    "us_per_pair": 0.14929656550438636
+  }
+}

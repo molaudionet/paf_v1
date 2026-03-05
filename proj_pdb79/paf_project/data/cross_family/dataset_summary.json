@@ -1,0 +1,105 @@
+{
+  "total": 79,
+  "families": {
+    "kinase": {
+      "count": 24,
+      "subfamilies": [
+        "ABL",
+        "AKT1",
+        "ALK",
+        "BRAF",
+        "CDK2",
+        "CDK4",
+        "CK1",
+        "CLK1",
+        "DAPK1",
+        "EGFR",
+        "ERK2",
+        "FGFR1",
+        "GSK3B",
+        "KIT",
+        "LCK",
+        "MEK1",
+        "PAK1",
+        "PDGFR",
+        "PKA",
+        "PKCtheta",
+        "ROCK1",
+        "SRC",
+        "VEGFR2",
+        "p38alpha"
+      ]
+    },
+    "serine_protease": {
+      "count": 18,
+      "subfamilies": [
+        "DPP4",
+        "FVIIa",
+        "FXIa",
+        "FXa",
+        "HCV_protease",
+        "KLK5",
+        "chymotrypsin",
+        "elastase",
+        "granzyme_B",
+        "kallikrein",
+        "matriptase",
+        "plasmin",
+        "proteinase_K",
+        "subtilisin",
+        "thrombin",
+        "trypsin",
+        "trypsinogen",
+        "uPA"
+      ]
+    },
+    "metalloprotease": {
+      "count": 18,
+      "subfamilies": [
+        "ACE",
+        "ACE2",
+        "ADAM17",
+        "MMP1",
+        "MMP12",
+        "MMP13",
+        "MMP14",
+        "MMP1_B",
+        "MMP2",
+        "MMP3",
+        "MMP3_B",
+        "MMP7",
+        "MMP8",
+        "MMP8_B",
+        "MMP9",
+        "neprilysin",
+        "thermolysin",
+        "thermolysin_B"
+      ]
+    },
+    "nuclear_receptor": {
+      "count": 19,
+      "subfamilies": [
+        "AR",
+        "AR_B",
+        "ERalpha",
+        "ERalpha_B",
+        "ERbeta",
+        "ERbeta_B",
+        "FXR",
+        "GR",
+        "LXRbeta",
+        "MR",
+        "PPARalpha",
+        "PPARdelta",
+        "PPARgamma",
+        "PPARgamma_B",
+        "PR",
+        "RARgamma",
+        "RXRalpha",
+        "TRbeta",
+        "VDR"
+      ]
+    }
+  },
+  "failed": 0
+}

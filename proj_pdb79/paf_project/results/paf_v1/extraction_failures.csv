@@ -1,0 +1,12 @@
+key,pdb_path,chain_id,err
+4V01.pdb|A,data/kinase_pdbs/4V01.pdb,A,No ligand centroid and kinase motifs not found.
+1BKX.pdb|A,data/kinase_pdbs/1BKX.pdb,A,No ligand centroid and kinase motifs not found.
+3CQW.pdb|A,data/kinase_pdbs/3CQW.pdb,A,No ligand centroid and kinase motifs not found.
+3MV5.pdb|A,data/kinase_pdbs/3MV5.pdb,A,No ligand centroid and kinase motifs not found.
+3A8W.pdb|A,data/kinase_pdbs/3A8W.pdb,A,No ligand centroid and kinase motifs not found.
+2X39.pdb|A,data/kinase_pdbs/2X39.pdb,A,No ligand centroid and kinase motifs not found.
+4GV1.pdb|A,data/kinase_pdbs/4GV1.pdb,A,No ligand centroid and kinase motifs not found.
+3HHM.pdb|A,data/kinase_pdbs/3HHM.pdb,A,No ligand centroid and kinase motifs not found.
+4KN7.pdb|A,data/kinase_pdbs/4KN7.pdb,A,No ligand centroid and kinase motifs not found.
+3EFJ.pdb|A,data/kinase_pdbs/3EFJ.pdb,A,No ligand centroid and kinase motifs not found.
+4WBO.pdb|A,data/kinase_pdbs/4WBO.pdb,A,No ligand centroid and kinase motifs not found.

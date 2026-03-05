@@ -1,0 +1,20 @@
+Use MAF (Molecular Acoustic Fingerprinting).
+The branding symmetry with PAF is too valuable to pass up. The genetics acronym collision is manageable because your context (drug discovery/audio AI) is distinct enough from population genetics. Just ensure you always define it clearly on first use.
+
+
+Go with MAF (Molecular Acoustic Fingerprinting), but frame it carefully:
+In the Companion Paper: Define it early: "Herein we refer to this method as Molecular Acoustic Fingerprinting (MAF) to distinguish it from the protein-specific extension (PAF)."
+In the PAF Preprint: Update the reference to the companion work to include the acronym for consistency.
+Current: "companion work on multi-modal molecular sonification..."
+Revised: "companion work on Molecular Acoustic Fingerprinting (MAF) for small-molecule property prediction..."
+Leverage the Duality: In marketing/pitch decks, present them as:
+MAF: Small Molecule Representations
+PAF: Protein Pocket Representations
+Together: A Unified Audio Modality for Drug Discovery
+
+Protein Acoustic Fingerprinting (PAF) is a deterministic, training-free method that:
+Maps protein binding pocket structural elements to localized oscillatory functions
+Superposes these oscillators to generate interference patterns encoding collective pocket organization
+Applies spectral transformation (FFT) to produce compact, fixed-length embedding vectors
+Enables similarity search, classification, and conformational state detection without supervised training
+

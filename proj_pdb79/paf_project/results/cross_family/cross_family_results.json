@@ -1,0 +1,206 @@
+[
+  {
+    "method": "PAF_v1",
+    "family_1nn": 0.7721518987341772,
+    "family_3nn": 0.7215189873417721,
+    "family_cohen_d": 0.7482240582086801,
+    "family_p_value": 0.0,
+    "family_gap": 0.10180392861366272,
+    "subfamily_results": {
+      "kinase": {
+        "n": 24,
+        "n_subfamilies": 24,
+        "random_baseline": 0.041666666666666664,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "metalloprotease": {
+        "n": 18,
+        "n_subfamilies": 18,
+        "random_baseline": 0.05555555555555555,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "nuclear_receptor": {
+        "n": 19,
+        "n_subfamilies": 19,
+        "random_baseline": 0.05263157894736842,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "serine_protease": {
+        "n": 18,
+        "n_subfamilies": 18,
+        "random_baseline": 0.05555555555555555,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      }
+    },
+    "confusion_matrix": {
+      "kinase": {
+        "kinase": 20,
+        "metalloprotease": 2,
+        "nuclear_receptor": 1,
+        "serine_protease": 0
+      },
+      "metalloprotease": {
+        "kinase": 1,
+        "metalloprotease": 14,
+        "nuclear_receptor": 3,
+        "serine_protease": 2
+      },
+      "nuclear_receptor": {
+        "kinase": 1,
+        "metalloprotease": 1,
+        "nuclear_receptor": 12,
+        "serine_protease": 1
+      },
+      "serine_protease": {
+        "kinase": 2,
+        "metalloprotease": 1,
+        "nuclear_receptor": 3,
+        "serine_protease": 15
+      }
+    }
+  },
+  {
+    "method": "FP-A_mean",
+    "family_1nn": 0.6075949367088608,
+    "family_3nn": 0.6835443037974683,
+    "family_cohen_d": 0.4199157236863928,
+    "family_p_value": 0.0,
+    "family_gap": 0.003186464309692383,
+    "subfamily_results": {
+      "kinase": {
+        "n": 24,
+        "n_subfamilies": 24,
+        "random_baseline": 0.041666666666666664,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "metalloprotease": {
+        "n": 18,
+        "n_subfamilies": 18,
+        "random_baseline": 0.05555555555555555,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "nuclear_receptor": {
+        "n": 19,
+        "n_subfamilies": 19,
+        "random_baseline": 0.05263157894736842,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "serine_protease": {
+        "n": 18,
+        "n_subfamilies": 18,
+        "random_baseline": 0.05555555555555555,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      }
+    },
+    "confusion_matrix": {
+      "kinase": {
+        "kinase": 12,
+        "metalloprotease": 3,
+        "nuclear_receptor": 7,
+        "serine_protease": 2
+      },
+      "metalloprotease": {
+        "kinase": 5,
+        "metalloprotease": 13,
+        "nuclear_receptor": 1,
+        "serine_protease": 2
+      },
+      "nuclear_receptor": {
+        "kinase": 6,
+        "metalloprotease": 0,
+        "nuclear_receptor": 11,
+        "serine_protease": 2
+      },
+      "serine_protease": {
+        "kinase": 1,
+        "metalloprotease": 2,
+        "nuclear_receptor": 0,
+        "serine_protease": 12
+      }
+    }
+  },
+  {
+    "method": "FP-B_radial",
+    "family_1nn": 0.6708860759493671,
+    "family_3nn": 0.6329113924050633,
+    "family_cohen_d": 0.3173394270593568,
+    "family_p_value": 6.084022174945858e-14,
+    "family_gap": 0.041626572608947754,
+    "subfamily_results": {
+      "kinase": {
+        "n": 24,
+        "n_subfamilies": 24,
+        "random_baseline": 0.041666666666666664,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "metalloprotease": {
+        "n": 18,
+        "n_subfamilies": 18,
+        "random_baseline": 0.05555555555555555,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "nuclear_receptor": {
+        "n": 19,
+        "n_subfamilies": 19,
+        "random_baseline": 0.05263157894736842,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      },
+      "serine_protease": {
+        "n": 18,
+        "n_subfamilies": 18,
+        "random_baseline": 0.05555555555555555,
+        "1nn": 0.0,
+        "cohen_d": 0.0,
+        "p_value": 1.0
+      }
+    },
+    "confusion_matrix": {
+      "kinase": {
+        "kinase": 18,
+        "metalloprotease": 1,
+        "nuclear_receptor": 0,
+        "serine_protease": 0
+      },
+      "metalloprotease": {
+        "kinase": 2,
+        "metalloprotease": 13,
+        "nuclear_receptor": 5,
+        "serine_protease": 3
+      },
+      "nuclear_receptor": {
+        "kinase": 2,
+        "metalloprotease": 2,
+        "nuclear_receptor": 10,
+        "serine_protease": 3
+      },
+      "serine_protease": {
+        "kinase": 2,
+        "metalloprotease": 2,
+        "nuclear_receptor": 4,
+        "serine_protease": 12
+      }
+    }
+  }
+]

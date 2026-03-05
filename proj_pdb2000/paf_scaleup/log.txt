@@ -1,0 +1,165 @@
+
+(sound-of-molecules) bash-3.2$ bash run_all.sh --step 3
+============================================================
+  PAF Scale-Up Pipeline v2 (real encoder)
+  Sound of Molecules LLC
+============================================================
+
+  Data dir:    /Users/jzhou/bk/bioai/proj3/paf_scaleup/data
+  PDB dir:     /Users/jzhou/bk/bioai/proj3/paf_scaleup/data/pdbs
+  Results dir: /Users/jzhou/bk/bioai/proj3/paf_scaleup/results
+  Start step:  3
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  STEP 3: Running Experiments (real PAF encoder)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+======================================================================
+  EXPERIMENT: Cross-Family Pocket Classification
+======================================================================
+
+  Loaded 1683 entries
+
+  Encoding pockets (spectral + mean + radial)...
+    Processed 100/1683 (success=94, fail=6)
+    Processed 200/1683 (success=194, fail=6)
+    Processed 300/1683 (success=293, fail=7)
+    Processed 500/1683 (success=337, fail=163)
+    Processed 600/1683 (success=433, fail=167)
+    Processed 700/1683 (success=530, fail=170)
+    Processed 800/1683 (success=628, fail=172)
+    Processed 900/1683 (success=727, fail=173)
+    Processed 1000/1683 (success=825, fail=175)
+    Processed 1100/1683 (success=919, fail=181)
+    Processed 1200/1683 (success=1014, fail=186)
+    Processed 1300/1683 (success=1112, fail=188)
+    Processed 1400/1683 (success=1210, fail=190)
+    Processed 1500/1683 (success=1308, fail=192)
+    Processed 1600/1683 (success=1406, fail=194)
+    Done: 1489 encoded, 194 failed out of 1683
+
+  Encoding time: 1625.4s (1489 pockets)
+
+  Family distribution:
+    kinase                        :  293
+    nuclear_receptor              :  196
+    metalloprotease               :  128
+    phosphatase                   :   99
+    phosphodiesterase             :   98
+    bromodomain                   :   98
+    carbonic_anhydrase            :   94
+    proteasome                    :   80
+    dihydrofolate_reductase       :   80
+    cyclooxygenase                :   79
+    histone_deacetylase           :   79
+    aspartyl_protease             :   63
+    serine_protease               :   44
+    hsp90                         :   39
+    gpcr                          :   19
+
+  After filtering (>=5/family): 1489 structures, 15 families
+
+  ── SPECTRAL (dim=7680) ──
+    PCA sweep...
+      no_pca      : acc=0.856  bacc=0.803  var=1.000
+      pca_100     : acc=0.854  bacc=0.801  var=0.967
+      pca_200     : acc=0.856  bacc=0.802  var=0.992
+      pca_30      : acc=0.837  bacc=0.781  var=0.762
+      pca_50      : acc=0.853  bacc=0.798  var=0.887
+      pca_500     : acc=0.857  bacc=0.804  var=1.000
+    Using PCA(500)
+    Permutation test (10000 perms)...
+    Accuracy:          0.857
+    Balanced accuracy: 0.804
+    Cohen's d:         1.420
+    p-value:           0.00e+00
+    Fold vs random:    8.98x
+
+  ── MEAN (dim=30) ──
+    Permutation test (10000 perms)...
+    Accuracy:          0.821
+    Balanced accuracy: 0.770
+    Cohen's d:         0.475
+    p-value:           0.00e+00
+    Fold vs random:    8.60x
+
+  ── RADIAL (dim=480) ──
+    Permutation test (10000 perms)...
+    Accuracy:          0.602
+    Balanced accuracy: 0.513
+    Cohen's d:         0.381
+    p-value:           0.00e+00
+    Fold vs random:    6.31x
+
+======================================================================
+  RESULTS: Cross-Family (1489 structures, 15 families)
+======================================================================
+  Method                        Acc  BalAcc        d            p    Fold
+  --------------------------------------------------------------------
+  spectral (PCA=500)          0.857   0.804    1.420     0.00e+00   8.98x
+  mean                        0.821   0.770    0.475     0.00e+00   8.60x
+  radial                      0.602   0.513    0.381     0.00e+00   6.31x
+
+======================================================================
+  EXPERIMENT: Kinase Analysis
+======================================================================
+
+  Loaded 310 kinase entries
+
+  Encoding pockets...
+    Processed 100/310 (success=100, fail=0)
+    Processed 200/310 (success=198, fail=2)
+    Processed 300/310 (success=298, fail=2)
+    Done: 308 encoded, 2 failed out of 310
+
+  Subfamily: 273 structures, 42 subfamilies
+    spectral       : acc=0.788  bacc=0.749  d=1.702  p=0.00e+00
+    mean           : acc=0.575  bacc=0.555  d=0.716  p=0.00e+00
+    radial         : acc=0.227  bacc=0.211  d=0.171  p=0.00e+00
+
+  DFG: 280 structures (in=253, out=27)
+    spectral       : acc=0.986  bacc=0.959  d=0.152  p=0.00e+00  in=0.992  out=0.926
+    mean           : acc=0.954  bacc=0.842  d=0.008  p=0.00e+00  in=0.980  out=0.704
+    radial         : acc=0.921  bacc=0.741  d=-0.031  p=0.00e+00  in=0.964  out=0.519
+
+  Saved: /Users/jzhou/bk/bioai/proj3/paf_scaleup/results/kinase_results.json
+
+======================================================================
+  BENCHMARK: Encoding Speed
+======================================================================
+
+  Timing on 200 entries...
+  Encoding: 948.5 ms/pocket (194 valid)
+  Pairwise: 194x194 (18,721 pairs) in 0.003s (0.15 us/pair)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Results:
+-rw-r--r--  1 jzhou  staff  7015 Mar  3 22:03 /Users/jzhou/bk/bioai/proj3/paf_scaleup/results/cross_family_results.json
+-rw-r--r--  1 jzhou  staff  2709 Mar  3 22:15 /Users/jzhou/bk/bioai/proj3/paf_scaleup/results/kinase_results.json
+-rw-r--r--  1 jzhou  staff   264 Mar  3 22:18 /Users/jzhou/bk/bioai/proj3/paf_scaleup/results/timing_benchmark.json
+
+  ── cross_family_results.json ──
+    spectral                           : acc=0.857  bacc=0.804  d=1.4200918961760935  p=0.0
+    mean                               : acc=0.821  bacc=0.770  d=0.4749024153032736  p=0.0
+    radial                             : acc=0.602  bacc=0.513  d=0.381269184069173  p=0.0
+
+  ── kinase_results.json ──
+    subfamily_spectral                 : acc=0.788  bacc=0.749  d=1.7024551457740067  p=0.0
+    subfamily_mean                     : acc=0.575  bacc=0.555  d=0.7161542846394451  p=0.0
+    subfamily_radial                   : acc=0.227  bacc=0.211  d=0.17124726737640103  p=0.0
+    dfg_spectral                       : acc=0.986  bacc=0.959  d=0.1517054830969888  p=0.0
+    dfg_mean                           : acc=0.954  bacc=0.842  d=0.007656062740766075  p=0.0
+    dfg_radial                         : acc=0.921  bacc=0.741  d=-0.03095117141617187  p=0.0
+
+  ── timing_benchmark.json ──
+    encoding                           : 948.5 ms/pocket
+    pairwise                           : 0.15 us/pair
+
+============================================================
+  Pipeline Complete!
+============================================================
+(sound-of-molecules) bash-3.2$                            
+

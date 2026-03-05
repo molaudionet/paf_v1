@@ -1,0 +1,8 @@
+{
+  "n": 50,
+  "top1_cosine": 0.02,
+  "top5_cosine": 0.08,
+  "top10_cosine": 0.16,
+  "mrr_cosine": 0.08090238781159456,
+  "mean_auroc_cosine": 0.4861224489795919
+}
