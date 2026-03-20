@@ -1,4 +1,3 @@
-```markdown
 # Protein Acoustic Fingerprinting (PAF) v1
 
 [![DOI: Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.18831908.svg)](https://doi.org/10.5281/zenodo.18831908)
@@ -10,18 +9,20 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 **Protein Acoustic Fingerprinting (PAF)** is a training-free, deterministic method for generating compact numerical embeddings of protein binding pockets. Instead of aggregating residue features through pooling or binning, PAF maps structural elements to localized oscillatory functions whose superposition produces interference patterns encoding collective pocket organization. Spectral transformation (FFT) yields fixed-length embedding vectors suitable for similarity search, classification, and machine learning.
 
+PAF is the protein-pocket extension of **Molecular Acoustic Fingerprinting (MAF)**, our framework for small-molecule sonification ([companion paper](https://doi.org/10.5281/zenodo.18831908)). Together, MAF and PAF establish a unified audio modality for drug discovery — encoding both ligands and targets as waveforms natively compatible with pretrained audio AI.
+
 ### Key Features
 
--  **Training-free**: No supervised learning or gradient descent required
--  **Deterministic**: Same input always produces same output
--  **Compact**: Fixed-length embeddings regardless of pocket size
--  **Interpretable**: Parameters map to physicochemical properties
--  **Fast**: ~18 ms per pocket on CPU
--  **Audio-compatible**: Waveforms can leverage pretrained audio AI models (wav2vec 2.0, Whisper)
+- **Training-free**: No supervised learning or gradient descent required
+- **Deterministic**: Same input always produces same output
+- **Compact**: Fixed-length embeddings regardless of pocket size
+- **Interpretable**: Parameters map to physicochemical properties
+- **Fast**: ~18 ms per pocket on CPU
+- **Audio-compatible**: Waveforms can leverage pretrained audio AI models (wav2vec 2.0, Whisper)
 
 ### What PAF Captures
 
@@ -35,14 +36,16 @@
 
 ---
 
-##  Citation
+## Citation
 
 If you use PAF in your research, please cite:
 
 **Paper:**
 ```bibtex
 @article{zhou2026spectral,
-  title={Spectral Encoding of Protein Binding Pockets via Deterministic Oscillatory Superposition: Toward an Audio Modality for Molecular Representation},
+  title={Spectral Encoding of Protein Binding Pockets via Deterministic
+         Oscillatory Superposition: Toward an Audio Modality for
+         Molecular Representation},
   author={Zhou, Emily Rong and Zhou, Charles Jianping},
   journal={Zenodo},
   year={2026},
@@ -63,7 +66,7 @@ If you use PAF in your research, please cite:
 
 ---
 
-##  Method Summary
+## Method Summary
 
 ```
 PDB Structure → Pocket Extraction → Residue Features (30-dim)
@@ -89,7 +92,7 @@ E = |FFT(s(t))|
 
 ---
 
-##  Installation
+## Installation
 
 ### Requirements
 
@@ -109,12 +112,12 @@ pip install -r requirements.txt
 
 ---
 
-##  Quick Start
+## Quick Start
 
 ### Basic Usage
 
 ```python
-from paf_core_v1 import PAFParams, extract_pocket, pocket_to_embedding
+from src.paf_core_v1 import PAFParams, extract_pocket, pocket_to_embedding
 
 # Initialize parameters
 params = PAFParams(
@@ -128,16 +131,19 @@ params = PAFParams(
 
 # Extract pocket from PDB
 pocket = extract_pocket(
-    pdb_path="structure.pdb",
+    pdb_path="data/pdbs/1ATP.pdb",
     chain_id="A",
     ligand_resname="ATP",
     params=params,
 )
 
 # Generate embedding
-spectrum, embedding = pocket_to_embedding(pocket, params)
+spectrum, channel_names = pocket_to_embedding(pocket, params)
 
-# embedding is a fixed-length numpy array ready for similarity search
+# spectrum is a (30, 256) numpy array — flatten and L2-normalize for similarity search
+import numpy as np
+embedding = spectrum.flatten()
+embedding = embedding / (np.linalg.norm(embedding) + 1e-12)
 ```
 
 ### Batch Processing
@@ -146,15 +152,17 @@ spectrum, embedding = pocket_to_embedding(pocket, params)
 import numpy as np
 from pathlib import Path
 
-pdb_files = list(Path("pdbs/").glob("*.pdb"))
+pdb_files = list(Path("data/pdbs/").glob("*.pdb"))
 embeddings = []
 
 for pdb in pdb_files:
     pocket = extract_pocket(str(pdb), chain_id="A", ligand_resname="", params=params)
-    _, emb = pocket_to_embedding(pocket, params)
+    spec, _ = pocket_to_embedding(pocket, params)
+    emb = spec.flatten()
+    emb = emb / (np.linalg.norm(emb) + 1e-12)
     embeddings.append(emb)
 
-embeddings = np.stack(embeddings)  # Shape: (N_pockets, embedding_dim)
+embeddings = np.stack(embeddings)  # Shape: (N_pockets, 7680)
 ```
 
 ### Similarity Search
@@ -171,7 +179,7 @@ similar_indices = np.argsort(-S[0])[1:6]  # Top 5 neighbors
 
 ---
 
-## 📊 Benchmarks
+## Benchmarks
 
 ### Cross-Family Pocket Discrimination (N=79, 4 families)
 *Results from preprint (Zenodo 18831908)*
@@ -212,46 +220,75 @@ similar_indices = np.argsort(-S[0])[1:6]  # Top 5 neighbors
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 paf_v1/
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── paf_core_v1.py          # Core encoding implementation
-├── compare_paf_vs_baselines_v1.py  # Benchmark script
-├── spectral_encoder.py     # Batch encoding
-├── data/
-│   ├── kinase_list.csv     # Example manifest
-│   └── pdbs/               # PDB files (download separately)
-├── results/                # Generated embeddings (.gitignored)
-├── figures/                # Visualization outputs
-└── notebooks/              # Example Jupyter notebooks
+├── README.md                           # This file
+├── LICENSE                             # MIT License
+├── requirements.txt                    # Python dependencies
+├── .gitignore
+│
+├── src/                                # Source code
+│   ├── paf_core_v1.py                  # Core PAF encoding engine
+│   ├── compare_paf_vs_baselines_v1.py  # Head-to-head benchmark script
+│   ├── spectral_encoder.py             # Batch encoding adapter
+│   ├── curate_cross_family_dataset.py  # Cross-family dataset curation
+│   ├── curate_dfg_dataset.py           # DFG conformation dataset curation
+│   ├── run_cross_family_paf.py         # Cross-family experiment
+│   ├── run_dfg_experiment.py           # DFG conformation experiment
+│   ├── ligand_retrieval_v1.py          # Ligand–pocket retrieval experiment
+│   ├── fix_cocrystal_csv.py            # Ligand name auto-correction utility
+│   └── redownload_pdbs.py             # PDB re-download with HETATM verification
+│
+├── scripts/                            # Shell scripts for running experiments
+│   ├── run_all.sh                      # Master pipeline script
+│   ├── download_pdbs.sh                # Bulk PDB download
+│   ├── cross.sh                        # Run cross-family experiment
+│   ├── dfg.sh                          # Run DFG experiment
+│   └── ligand_pocket.sh                # Run ligand retrieval experiment
+│
+├── data/                               # Datasets (small CSVs tracked; PDBs gitignored)
+│   ├── kinase_list.csv                 # Example kinase manifest
+│   ├── cross_family/                   # Cross-family dataset
+│   │   └── cross_family_list.csv
+│   ├── dfg/                            # DFG-in/DFG-out dataset
+│   │   └── dfg_list.csv
+│   └── pdbs/                           # Downloaded PDB files (gitignored)
+│
+├── results/                            # Experiment outputs (gitignored)
+│   └── .gitkeep
+│
+├── figures/                            # Visualization outputs
+│
+└── notebooks/                          # Example Jupyter notebooks
 ```
 
 ---
 
-##  Precomputed Data
+## Precomputed Data
 
 Precomputed embeddings for benchmark datasets are available on Zenodo:
 
 | Dataset | Structures | DOI |
 |---------|------------|-----|
-| Cross-Family (79) | 79 pockets | [10.5281/zenodo.18881847](https://doi.org/10.5281/zenodo.18881847) |
-| Large-Scale (1168) | 1168 pockets | [10.5281/zenodo.18881847](https://doi.org/10.5281/zenodo.18881847) |
+| Cross-Family (79) | 79 pockets, 4 families | [10.5281/zenodo.18881847](https://doi.org/10.5281/zenodo.18881847) |
+| Large-Scale (1168) | 1168 pockets, 15 families | [10.5281/zenodo.18881847](https://doi.org/10.5281/zenodo.18881847) |
 
 Download and load:
 ```python
 import numpy as np
 
 data = np.load("cross_family_embeddings.npz", allow_pickle=True)
-embeddings = {k: data[k] for k in data.files}
+spectral = data["spectral"]   # PAF embeddings
+mean = data["mean"]            # Mean aggregation baseline
+radial = data["radial"]        # Radial histogram baseline
+labels = data["labels"]        # Family labels
 ```
 
 ---
 
-##  Configuration
+## Configuration
 
 ### Recommended Parameters
 
@@ -273,7 +310,7 @@ embeddings = {k: data[k] for k in data.files}
 
 ---
 
-## 🔬 Applications
+## Applications
 
 - **Pocket Similarity Search**: Rapid comparison across structural databases
 - **Selectivity Profiling**: Identify off-target binding risks
@@ -283,7 +320,19 @@ embeddings = {k: data[k] for k in data.files}
 
 ---
 
-## ⚖️ Intellectual Property
+## Related Projects
+
+| Project | Description | Link |
+|---------|-------------|------|
+| **MAF** | Molecular Acoustic Fingerprinting — small-molecule sonification for property prediction | [companion paper](https://doi.org/10.5281/zenodo.18831908) |
+| **MolAudioNet** | Audio-based molecular AI platform | [github.com/molaudionet/molecularAI](https://github.com/molaudionet/molecularAI) |
+| **Sound of Molecules** | Company website | [soundofmolecules.com](https://soundofmolecules.com) |
+
+MAF encodes small molecules; PAF encodes protein pockets. Together they form a unified audio modality for drug discovery — representing both sides of the binding equation as waveforms compatible with pretrained speech AI.
+
+---
+
+## Intellectual Property
 
 This software is released under the **MIT License** for academic and research use.
 
@@ -296,17 +345,7 @@ For commercial inquiries, contact: **info@soundofmolecules.com**
 
 ---
 
-##  Related Projects
-
-| Project | Description | Link |
-|---------|-------------|------|
-| **MolAudioNet** | Small-molecule sonification framework | [github.com/molaudionet/molecularAI](https://github.com/molaudionet/molecularAI) |
-| **Companion Paper** | Multi-modal molecular sonification for property prediction | [DOI: 10.5281/zenodo.18831908](https://doi.org/10.5281/zenodo.18831908) |
-| **Sound of Molecules** | Company website | [soundofmolecules.com](https://soundofmolecules.com) |
-
----
-
-##  Acknowledgments
+## Acknowledgments
 
 This work is dedicated to:
 - **Professor Richard B. Silverman** on his 80th birthday and 50 years at Northwestern University
@@ -316,7 +355,7 @@ Funding support from the **University of Illinois iVenture Accelerator**.
 
 ---
 
-##  Contact
+## Contact
 
 | Role | Name | Email |
 |------|------|-------|
@@ -326,7 +365,7 @@ Funding support from the **University of Illinois iVenture Accelerator**.
 
 ---
 
-##  Version History
+## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
@@ -335,7 +374,7 @@ Funding support from the **University of Illinois iVenture Accelerator**.
 
 ---
 
-##  License
+## License
 
 MIT License — see [LICENSE](LICENSE) file for details.
 
@@ -348,4 +387,3 @@ MIT License — see [LICENSE](LICENSE) file for details.
 *Audio as a Molecular Modality for Drug Discovery*
 
 </div>
-```
