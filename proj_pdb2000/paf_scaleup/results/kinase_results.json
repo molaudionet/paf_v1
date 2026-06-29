@@ -10,31 +10,31 @@
       "n_components": 30,
       "accuracy": 0.7728937728937729,
       "balanced_accuracy": 0.7333333333333334,
-      "variance_explained": 0.8355643035635041
+      "variance_explained": 0.8355660774157367
     },
     "pca_50": {
       "n_components": 50,
       "accuracy": 0.7765567765567766,
       "balanced_accuracy": 0.7388605442176871,
-      "variance_explained": 0.9306859884974333
+      "variance_explained": 0.930686074816179
     },
     "pca_100": {
       "n_components": 100,
       "accuracy": 0.7838827838827839,
       "balanced_accuracy": 0.7456632653061225,
-      "variance_explained": 0.9888322414677359
+      "variance_explained": 0.9888323786406688
     },
     "pca_200": {
       "n_components": 200,
       "accuracy": 0.7838827838827839,
       "balanced_accuracy": 0.7456632653061225,
-      "variance_explained": 0.9994163764874603
+      "variance_explained": 0.9994163830238606
     }
   },
   "subfamily_spectral": {
     "accuracy": 0.7875457875457875,
     "balanced_accuracy": 0.7494047619047619,
-    "cohens_d": 1.7024551457740067,
+    "cohens_d": 1.7024659083034508,
     "p_value": 0.0,
     "n_structures": 273,
     "n_subfamilies": 42
@@ -42,7 +42,7 @@
   "subfamily_mean": {
     "accuracy": 0.575091575091575,
     "balanced_accuracy": 0.5554232804232805,
-    "cohens_d": 0.7161542846394451,
+    "cohens_d": 0.7161542846394447,
     "p_value": 0.0,
     "n_structures": 273,
     "n_subfamilies": 42
@@ -58,7 +58,7 @@
   "dfg_spectral": {
     "accuracy": 0.9857142857142858,
     "balanced_accuracy": 0.9590103937930026,
-    "cohens_d": 0.1517054830969888,
+    "cohens_d": 0.15170844109938844,
     "p_value": 0.0,
     "n_in": 253,
     "n_out": 27,
@@ -76,7 +76,7 @@
   "dfg_mean": {
     "accuracy": 0.9535714285714286,
     "balanced_accuracy": 0.8419704289269507,
-    "cohens_d": 0.007656062740766075,
+    "cohens_d": 0.007656062740766076,
     "p_value": 0.0,
     "n_in": 253,
     "n_out": 27,
@@ -94,7 +94,7 @@
   "dfg_radial": {
     "accuracy": 0.9214285714285714,
     "balanced_accuracy": 0.741472697994437,
-    "cohens_d": -0.03095117141617187,
+    "cohens_d": -0.030951171416171867,
     "p_value": 0.0,
     "n_in": 253,
     "n_out": 27,

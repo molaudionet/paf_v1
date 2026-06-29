@@ -2,56 +2,56 @@
   "spectral_pca_sweep": {
     "no_pca": {
       "n_components": 7680,
-      "accuracy": 0.8562793821356616,
-      "balanced_accuracy": 0.8033140346610114,
+      "accuracy": 0.8556979096426163,
+      "balanced_accuracy": 0.8039390698369467,
       "variance_explained": 1.0
     },
     "pca_30": {
       "n_components": 30,
-      "accuracy": 0.8374748153122902,
-      "balanced_accuracy": 0.7805320846014855,
-      "variance_explained": 0.7621716397685413
+      "accuracy": 0.837491571139582,
+      "balanced_accuracy": 0.7846164452273342,
+      "variance_explained": 0.7623696560501386
     },
     "pca_50": {
       "n_components": 50,
-      "accuracy": 0.8529214237743452,
-      "balanced_accuracy": 0.7982308002495501,
-      "variance_explained": 0.8867675471955784
+      "accuracy": 0.851652056641942,
+      "balanced_accuracy": 0.7980184988780898,
+      "variance_explained": 0.8870240851617174
     },
     "pca_100": {
       "n_components": 100,
-      "accuracy": 0.8542646071188718,
-      "balanced_accuracy": 0.8008404641331804,
-      "variance_explained": 0.966962151740368
+      "accuracy": 0.8550236008091706,
+      "balanced_accuracy": 0.8036683108695116,
+      "variance_explained": 0.9670404190871922
     },
     "pca_200": {
       "n_components": 200,
-      "accuracy": 0.8562793821356616,
-      "balanced_accuracy": 0.8024506159502888,
-      "variance_explained": 0.9918486116428813
+      "accuracy": 0.856372218476062,
+      "balanced_accuracy": 0.8037656649433881,
+      "variance_explained": 0.9918474291026858
     },
     "pca_500": {
       "n_components": 500,
-      "accuracy": 0.8569509738079247,
-      "balanced_accuracy": 0.8039657674654404,
-      "variance_explained": 0.9995923829761997
+      "accuracy": 0.8570465273095077,
+      "balanced_accuracy": 0.8052808164585396,
+      "variance_explained": 0.9995945107355441
     }
   },
   "spectral": {
-    "accuracy": 0.8569509738079247,
-    "balanced_accuracy": 0.8039657674654404,
-    "cohens_d": 1.4200918961760935,
+    "accuracy": 0.8570465273095077,
+    "balanced_accuracy": 0.8052808164585396,
+    "cohens_d": 1.419226413367911,
     "p_value": 0.0,
-    "random_baseline": 0.09542239688316514,
-    "fold_vs_random": 8.980606249675038,
+    "random_baseline": 0.09506299535895466,
+    "fold_vs_random": 9.015564090667763,
     "within_between": {
-      "within_mean": 0.2128985157459784,
-      "within_std": 0.293129752944232,
-      "between_mean": -0.022187266666848757,
-      "between_std": 0.14585785464729872,
-      "cohens_d": 1.4200918961760935,
-      "n_within_pairs": 105037,
-      "n_between_pairs": 1002779
+      "within_mean": 0.21283381917951627,
+      "within_std": 0.29346126131406214,
+      "between_mean": -0.02208960996292768,
+      "between_std": 0.14586009584697365,
+      "cohens_d": 1.419226413367911,
+      "n_within_pairs": 103794,
+      "n_between_pairs": 995109
     },
     "per_class_accuracy": {
       "aspartyl_protease": {
@@ -59,8 +59,8 @@
         "n": 63
       },
       "bromodomain": {
-        "recall": 0.9183673469387755,
-        "n": 98
+        "recall": 0.9072164948453608,
+        "n": 97
       },
       "carbonic_anhydrase": {
         "recall": 0.925531914893617,
@@ -79,27 +79,27 @@
         "n": 19
       },
       "histone_deacetylase": {
-        "recall": 0.9493670886075949,
-        "n": 79
+        "recall": 0.9487179487179487,
+        "n": 78
       },
       "hsp90": {
         "recall": 0.8205128205128205,
         "n": 39
       },
       "kinase": {
-        "recall": 0.9044368600682594,
-        "n": 293
+        "recall": 0.903448275862069,
+        "n": 290
       },
       "metalloprotease": {
         "recall": 0.7421875,
         "n": 128
       },
       "nuclear_receptor": {
-        "recall": 0.9387755102040817,
-        "n": 196
+        "recall": 0.9384615384615385,
+        "n": 195
       },
       "phosphatase": {
-        "recall": 0.8080808080808081,
+        "recall": 0.8181818181818182,
         "n": 99
       },
       "phosphodiesterase": {
@@ -111,30 +111,30 @@
         "n": 80
       },
       "serine_protease": {
-        "recall": 0.38636363636363635,
+        "recall": 0.4090909090909091,
         "n": 44
       }
     },
-    "n_structures": 1489,
+    "n_structures": 1483,
     "n_families": 15,
     "embedding_dim_raw": 7680,
     "pca_components": 500
   },
   "mean": {
-    "accuracy": 0.8206850235057085,
-    "balanced_accuracy": 0.769816550323611,
-    "cohens_d": 0.4749024153032736,
+    "accuracy": 0.8186109238031019,
+    "balanced_accuracy": 0.7686433950305662,
+    "cohens_d": 0.47138716445444206,
     "p_value": 0.0,
-    "random_baseline": 0.09542239688316514,
-    "fold_vs_random": 8.600549245378446,
+    "random_baseline": 0.09506299535895466,
+    "fold_vs_random": 8.611246896987147,
     "within_between": {
-      "within_mean": 0.9837329522244438,
-      "within_std": 0.01971407528462563,
-      "between_mean": 0.972677094296009,
-      "between_std": 0.023622665884769713,
-      "cohens_d": 0.4749024153032736,
-      "n_within_pairs": 105037,
-      "n_between_pairs": 1002779
+      "within_mean": 0.9836389674119018,
+      "within_std": 0.019796254489724253,
+      "between_mean": 0.9726528108707312,
+      "between_std": 0.02364208657443512,
+      "cohens_d": 0.47138716445444206,
+      "n_within_pairs": 103794,
+      "n_between_pairs": 995109
     },
     "per_class_accuracy": {
       "aspartyl_protease": {
@@ -142,8 +142,8 @@
         "n": 63
       },
       "bromodomain": {
-        "recall": 0.8469387755102041,
-        "n": 98
+        "recall": 0.8350515463917526,
+        "n": 97
       },
       "carbonic_anhydrase": {
         "recall": 0.925531914893617,
@@ -162,24 +162,24 @@
         "n": 19
       },
       "histone_deacetylase": {
-        "recall": 0.9367088607594937,
-        "n": 79
+        "recall": 0.9358974358974359,
+        "n": 78
       },
       "hsp90": {
         "recall": 0.7435897435897436,
         "n": 39
       },
       "kinase": {
-        "recall": 0.9078498293515358,
-        "n": 293
+        "recall": 0.903448275862069,
+        "n": 290
       },
       "metalloprotease": {
         "recall": 0.6171875,
         "n": 128
       },
       "nuclear_receptor": {
-        "recall": 0.9030612244897959,
-        "n": 196
+        "recall": 0.9025641025641026,
+        "n": 195
       },
       "phosphatase": {
         "recall": 0.7676767676767676,
@@ -198,26 +198,26 @@
         "n": 44
       }
     },
-    "n_structures": 1489,
+    "n_structures": 1483,
     "n_families": 15,
     "embedding_dim_raw": 30,
     "pca_components": null
   },
   "radial": {
-    "accuracy": 0.6024177300201478,
-    "balanced_accuracy": 0.5133486794102331,
-    "cohens_d": 0.381269184069173,
+    "accuracy": 0.5987862440997977,
+    "balanced_accuracy": 0.5083340657191702,
+    "cohens_d": 0.377850793608089,
     "p_value": 0.0,
-    "random_baseline": 0.09542239688316514,
-    "fold_vs_random": 6.313169126926732,
+    "random_baseline": 0.09506299535895466,
+    "fold_vs_random": 6.298836280498012,
     "within_between": {
-      "within_mean": 0.6526445828072618,
-      "within_std": 0.149492685569243,
-      "between_mean": 0.597221719563425,
-      "between_std": 0.14492473054447674,
-      "cohens_d": 0.381269184069173,
-      "n_within_pairs": 105037,
-      "n_between_pairs": 1002779
+      "within_mean": 0.6526571901827223,
+      "within_std": 0.14931929079856637,
+      "between_mean": 0.5978378917813155,
+      "between_std": 0.14463258963963715,
+      "cohens_d": 0.377850793608089,
+      "n_within_pairs": 103794,
+      "n_between_pairs": 995109
     },
     "per_class_accuracy": {
       "aspartyl_protease": {
@@ -225,8 +225,8 @@
         "n": 63
       },
       "bromodomain": {
-        "recall": 0.4897959183673469,
-        "n": 98
+        "recall": 0.4845360824742268,
+        "n": 97
       },
       "carbonic_anhydrase": {
         "recall": 0.6595744680851063,
@@ -245,24 +245,24 @@
         "n": 19
       },
       "histone_deacetylase": {
-        "recall": 0.4936708860759494,
-        "n": 79
+        "recall": 0.47435897435897434,
+        "n": 78
       },
       "hsp90": {
         "recall": 0.3333333333333333,
         "n": 39
       },
       "kinase": {
-        "recall": 0.8020477815699659,
-        "n": 293
+        "recall": 0.803448275862069,
+        "n": 290
       },
       "metalloprotease": {
         "recall": 0.4140625,
         "n": 128
       },
       "nuclear_receptor": {
-        "recall": 0.7142857142857143,
-        "n": 196
+        "recall": 0.7076923076923077,
+        "n": 195
       },
       "phosphatase": {
         "recall": 0.5454545454545454,
@@ -277,11 +277,11 @@
         "n": 80
       },
       "serine_protease": {
-        "recall": 0.13636363636363635,
+        "recall": 0.09090909090909091,
         "n": 44
       }
     },
-    "n_structures": 1489,
+    "n_structures": 1483,
     "n_families": 15,
     "embedding_dim_raw": 480,
     "pca_components": null
