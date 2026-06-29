@@ -82,3 +82,7 @@ results/
 ├── kinase_results.json            # Subfamily + DFG with balanced accuracy
 └── timing_benchmark.json          # ms/pocket, μs/pair
 ```
+To finish locking it in:
+Commit cross_family_FROZEN.csv to GitHub repo.
+Make future runs use --manifest data/cross_family_FROZEN.csv (or point Step 1 at it) so the pipeline loads the frozen 1,483 instead of re-curating.
+When convenient, do the same capture for the kinase set so all three datasets are frozen (though those already reproduce exactly).
